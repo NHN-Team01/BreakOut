@@ -1,12 +1,11 @@
 package com.nhnacademy;
 
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class BoomBrick extends Brick {
+public class BombBrick extends Brick {
 
     // 생성자
-    public BoomBrick(double x, double y, double width, double height) {
+    public BombBrick(double x, double y, double width, double height) {
         super(x, y, width, height, 1);
         this.color = Color.GRAY;
         this.HP = 1;

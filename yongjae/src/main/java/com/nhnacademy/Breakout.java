@@ -53,7 +53,7 @@ public class Breakout extends Application {
                 double x = startX + col * (brickWidth + padding);
                 double y = startY + row * (brickHeight + padding);
                 if ((row == 3 && col == 2) || (row == 3 && col == 7)) {
-                    bricks.get(row).add(new BoomBrick(x, y, brickWidth, brickHeight));
+                    bricks.get(row).add(new BombBrick(x, y, brickWidth, brickHeight));
                 }
                 else {
                     bricks.get(row).add(new Brick(x, y, brickWidth, brickHeight, (int) (Math.random()*5) + 1));
@@ -106,7 +106,7 @@ public class Breakout extends Application {
                         Brick brick = bricks.get(i).get(j);
                         if (brick.checkCollision(ball)) {
                             ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
-                            if (brick instanceof BoomBrick) {
+                            if (brick instanceof BombBrick) {
                                 for ( int k = 0; k < dy.length; k++) {
                                     for (int l = 0; l < dy.length; l++) {
                                         int ni = i + dy[k];
