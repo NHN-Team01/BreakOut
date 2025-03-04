@@ -1,0 +1,193 @@
+= Brick 클래스 구현
+
+`Brick` 클래스는 벽돌 깨기 게임에서 공에 의해 깨지는 벽돌을 나타냅니다. 벽돌은 위치, 크기, 색상 등의 속성을 가지며, 공과의 충돌을 감지하는 로직을 포함합니다.
+
+[source,java]
+----
+package com.nhnacademy.brickbreaker;
+
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+
+public class Brick {
+    private double x; // 벽돌의 x 좌표
+    private double y; // 벽돌의 y 좌표
+    private double width; // 벽돌의 너비
+    private double height; // 벽돌의 높이
+    private Color color; // 벽돌의 색상
+    private boolean isDestroyed; // 벽돌이 파괴되었는지 여부
+
+    // 생성자
+    public Brick(double x, double y, double width, double height, Color color) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.color = color;
+        this.isDestroyed = false; // 초기 상태는 파괴되지 않음
+    }
+
+    // 벽돌을 그리는 메서드
+    public void draw(GraphicsContext gc) {
+        if (!isDestroyed) {
+            gc.setFill(color);
+            gc.fillRect(x, y, width, height); // 벽돌 그리기
+        }
+    }
+
+    // 공과 충돌 여부 확인
+    public boolean checkCollision(Ball ball) {
+        if (isDestroyed) {
+            return false; // 이미 파괴된 벽돌은 충돌하지 않음
+        }
+
+        double ballX = ball.getX();
+        double ballY = ball.getY();
+        double ballRadius = ball.getRadius();
+
+        // 공이 벽돌의 경계와 충돌했는지 확인
+        boolean collision =
+            ballX + ballRadius > x &&
+            ballX - ballRadius < x + width &&
+            ballY + ballRadius > y &&
+            ballY - ballRadius < y + height;
+
+        if (collision) {
+            isDestroyed = true; // 벽돌 파괴
+        }
+
+        return collision;
+    }
+
+    // Getter와 Setter (필요 시 사용)
+    public boolean isDestroyed() {
+        return isDestroyed;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+}
+----
+
+== Brick 클래스 주요 기능
+1. 벽돌 속성:
+** 위치 (`x`, `y`), 크기 (`width`, `height`), 색상 (`color`), 파괴 여부 (`isDestroyed`)를 관리.
+2. `draw` 메서드:
+** `GraphicsContext`를 사용해 벽돌을 그립니다. 파괴된 벽돌은 그리지 않습니다.
+3. `checkCollision` 메서드:
+** 공과 벽돌의 충돌 여부를 감지.
+** 충돌 시 벽돌을 파괴(`isDestroyed = true`).
+4. 충돌 로직:
+** 공의 중심과 반지름을 이용해 벽돌 경계와 충돌했는지 계산.
+
+---
+
+== Brick 클래스 활용 예제
+
+여러 개의 벽돌을 게임 화면에 배치하고 공과 충돌 시 파괴되는 로직을 구현합니다.
+
+[source,java]
+----
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class BrickBreakerApp extends Application {
+
+    @Override
+    public void start(Stage primaryStage) {
+        // Canvas 생성
+        Canvas canvas = new Canvas(800, 600);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // Ball 생성
+        Ball ball = new Ball(400, 300, 10, 3, 3, Color.RED);
+
+        // 벽돌 생성
+        List<Brick> bricks = new ArrayList<>();
+        int rows = 5;
+        int cols = 10;
+        double brickWidth = 70;
+        double brickHeight = 20;
+        double padding = 5;
+        double startX = 50;
+        double startY = 50;
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                double x = startX + col * (brickWidth + padding);
+                double y = startY + row * (brickHeight + padding);
+                bricks.add(new Brick(x, y, brickWidth, brickHeight, Color.BLUE));
+            }
+        }
+
+        // 게임 루프
+        AnimationTimer gameLoop = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                // 화면 초기화
+                gc.setFill(Color.BLACK);
+                gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+                // Ball 업데이트 및 그리기
+                ball.update();
+                ball.checkCollision(canvas.getWidth(), canvas.getHeight());
+                ball.draw(gc);
+
+                // 벽돌 그리기 및 충돌 처리
+                for (Brick brick : bricks) {
+                    if (brick.checkCollision(ball)) {
+                        ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
+                    }
+                    brick.draw(gc);
+                }
+            }
+        };
+        gameLoop.start();
+
+        // 레이아웃 설정
+        StackPane root = new StackPane();
+        root.getChildren().add(canvas);
+
+        Scene scene = new Scene(root, 800, 600);
+        primaryStage.setTitle("Brick Breaker");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+----
+
+== 설명
+1. 벽돌 배치:
+** `List<Brick>`를 사용하여 여러 개의 벽돌을 생성.
+** 행(row)과 열(column)을 반복문으로 계산하여 위치 설정.
+2. 벽돌과 공의 충돌 처리:
+** `checkCollision` 메서드를 호출해 충돌 여부를 확인.
+** 충돌 시 공의 `dy` 방향을 반전.
+3. 게임 루프:
+** 벽돌의 상태(`isDestroyed`)를 확인하여 화면에 그립니다.

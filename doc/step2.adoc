@@ -1,0 +1,176 @@
+= Canvas 추가 및 활용
+기본 게임 화면을 만들기 위해 `Canvas`를 사용하는 것은 JavaFX에서 2D 그래픽을 그리기에 적합한 방법입니다. `Canvas`는 화면에 직접 그림을 그리는 데 사용되며, 이를 통해 공, 패들, 벽돌 등의 게임 요소를 효율적으로 구현할 수 있습니다.
+
+`Canvas`는 JavaFX에서 2D 그래픽을 그리는 데 사용되는 특별한 UI 노드입니다. 이 섹션에서는 `Canvas`를 추가하고 사용하는 방법을 자세히 설명합니다.
+
+
+
+== 1. Canvas 생성
+JavaFX의 `Canvas` 클래스는 고정된 크기의 드로잉 영역을 제공합니다. 다음은 기본 `Canvas` 생성 코드입니다.
+
+[source,java]
+----
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+
+public class GameApp extends Application {
+
+    @Override
+    public void start(Stage primaryStage) {
+        // Canvas 생성 (800x600 크기)
+        Canvas canvas = new Canvas(800, 600);
+
+        // GraphicsContext 가져오기 (Canvas에 그림을 그릴 때 사용)
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // 기본 배경 설정
+        gc.setFill(javafx.scene.paint.Color.BLACK); // 배경색 검정
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight()); // 전체 채우기
+
+        // 레이아웃에 Canvas 추가
+        StackPane root = new StackPane();
+        root.getChildren().add(canvas);
+
+        // Scene 설정
+        Scene scene = new Scene(root, 800, 600);
+
+        // Stage 설정 및 표시
+        primaryStage.setTitle("Brick Breaker");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+----
+
+
+
+== 2. GraphicsContext 설명
+`GraphicsContext`는 `Canvas`의 그래픽 작업을 수행하는 데 사용됩니다. 이를 통해 선, 원, 사각형, 텍스트 등을 그릴 수 있습니다.
+
+=== 주요 메서드:
+
+1. 배경 색상 설정:
++
+[source,java]
+----
+   gc.setFill(Color.BLACK); // 채우기 색상
+   gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight()); // 사각형 채우기
+----
+
+2. 도형 그리기:
+** 사각형:
++
+[source,java]
+----
+     gc.setFill(Color.BLUE); // 채우기 색상
+     gc.fillRect(100, 100, 50, 50); // (x, y, width, height)
+----
+** 원:
++
+[source,java]
+----
+     gc.setFill(Color.RED);
+     gc.fillOval(200, 200, 30, 30); // (x, y, width, height)
+----
+** 선:
++
+[source,java]
+----
+     gc.setStroke(Color.WHITE); // 선 색상
+     gc.setLineWidth(2); // 선 두께
+     gc.strokeLine(50, 50, 150, 150); // 시작 (x1, y1) -> 끝 (x2, y2)
+----
+
+3. 텍스트 그리기:
++
+[source,java]
+----
+   gc.setFill(Color.GREEN);
+   gc.setFont(new Font("Arial", 20)); // 글꼴 및 크기 설정
+   gc.fillText("Hello Brick Breaker!", 300, 50); // 텍스트 위치 (x, y)
+----
+
+
+== 3. Canvas 크기와 화면 비율
+`Canvas`의 크기는 고정되어 있으므로 창 크기가 변경되면 크기를 동적으로 조정할 수 있도록 설정해야 할 수도 있습니다. 다음은 크기 조정 예제입니다.
+
+#### Canvas 크기 동적 조정:
+```java
+// Stage의 크기 변경에 따라 Canvas 크기 동기화
+primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
+    canvas.setWidth(newVal.doubleValue());
+});
+primaryStage.heightProperty().addListener((obs, oldVal, newVal) -> {
+    canvas.setHeight(newVal.doubleValue());
+    gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight()); // 배경 리셋
+});
+```
+
+
+
+== 4. Canvas 사용 시 주의사항
+* 퍼포먼스:
+  `Canvas`는 한 번 그려진 내용을 유지하므로, 화면을 업데이트할 때 이전 그림을 수동으로 지워야 합니다.
+  +
+  [source,java]
+  ----
+  gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // 화면 지우기
+  ----
+
+* 게임 루프에서 사용:
+  `Canvas`는 `AnimationTimer`와 함께 사용하면 동적인 화면을 효과적으로 그릴 수 있습니다. 이를 통해 공의 움직임, 패들 위치 등을 실시간으로 업데이트할 수 있습니다.
+
+
+
+== 5. 완성된 Canvas 예제 코드
+
+[source,java]
+----
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+
+public class GameApp extends Application {
+
+    @Override
+    public void start(Stage primaryStage) {
+        Canvas canvas = new Canvas(800, 600);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // 초기 화면 설정
+        gc.setFill(javafx.scene.paint.Color.BLACK);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        // 도형 및 텍스트 추가
+        gc.setFill(javafx.scene.paint.Color.BLUE);
+        gc.fillRect(100, 100, 200, 100); // 사각형
+        gc.setFill(javafx.scene.paint.Color.RED);
+        gc.fillOval(300, 200, 50, 50); // 원
+        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.fillText("Brick Breaker!", 350, 50); // 텍스트
+
+        StackPane root = new StackPane();
+        root.getChildren().add(canvas);
+
+        Scene scene = new Scene(root, 800, 600);
+        primaryStage.setTitle("Brick Breaker");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+----

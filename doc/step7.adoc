@@ -1,0 +1,135 @@
+= 게임 완성
+
+* 게임을 완성 하세요.
+
+== TODO
+
+* 패들을 추가하세요.
+** 키보드 방향키로 좌우 이동합니다.
+** 벽을 벗어나지 않습니다.
+** 공이 부딫힐 경우,튕겨 냅니다.
+* 게임의 실패 조건을 추가하세요.
+** 벽돌을 모두 없애기 전에 공이 아래쪽 벽에 닿을 경우 게임은 실패합니다.
+** 벽돌과 충돌을 감지하여 벽돌를 깨뜨리는 것과 유사한 방법으로 구현할 수 있습니다.
+* 바닥에 닫을 경우, 게임을 종료합니다.
+** 아래 참고를 보고 팝업을 띄웁니다.
+
+
+== 참고
+
+게임 루프 내에서 특정 조건을 완료했을 때 팝업을 출력하고, 사용자가 확인 버튼을 누르면 게임을 종료하는 방법을 구현할 수 있습니다. 아래는 이를 단계별로 설명한 코드입니다.
+
+=== 1. JavaFX Alert 팝업을 사용
+JavaFX에서 제공하는 `Alert` 클래스를 사용하면 팝업 창을 쉽게 표시할 수 있습니다. 팝업 창에서 확인 버튼을 누르면 `Platform.exit()`를 호출하여 게임을 종료할 수 있습니다.
+
+=== 2. 코드 구현
+아래는 `AnimationTimer` 기반의 게임 루프에서 조건 완료 시 팝업을 출력하고 종료하는 예제입니다.
+
+[source,java]
+----
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+
+public class GameWithExitPopup extends Application {
+    private boolean gameFinished = false; // 게임 완료 여부를 나타내는 플래그
+
+    @Override
+    public void start(Stage primaryStage) {
+        // Canvas 생성
+        Canvas canvas = new Canvas(800, 600);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // 게임 루프
+        AnimationTimer gameLoop = new AnimationTimer() {
+            int frameCount = 0; // 프레임 카운트 (조건 체크를 위한 예제)
+
+            @Override
+            public void handle(long now) {
+                if (gameFinished) {
+                    return; // 게임이 종료되었으면 루프 중단
+                }
+
+                // 화면 초기화
+                gc.setFill(Color.BLACK);
+                gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+                // 조건 체크: 예를 들어, 특정 프레임에서 게임 완료 처리
+                frameCount++;
+                if (frameCount > 300) { // 300프레임 이후 게임 종료 조건
+                    gameFinished = true; // 게임 완료 플래그 설정
+                    showGameOverPopup(); // 팝업 출력
+                }
+
+                // 게임 화면 예제 (원 그리기)
+                gc.setFill(Color.WHITE);
+                gc.fillOval(390, 290, 20, 20);
+            }
+        };
+
+        gameLoop.start();
+
+        // 레이아웃 설정
+        StackPane root = new StackPane(canvas);
+        Scene scene = new Scene(root, 800, 600);
+
+        primaryStage.setTitle("Game with Exit Popup");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    // 팝업을 표시하고 종료하는 메서드
+    private void showGameOverPopup() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(AlertType.INFORMATION, "Game Over! Thank you for playing.", ButtonType.OK);
+            alert.setTitle("Game Over");
+            alert.setHeaderText(null);
+
+            // 팝업 닫기 후 게임 종료
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.OK) {
+                    Platform.exit(); // 게임 종료
+                }
+            });
+        });
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+----
+
+==== 코드 설명
+1. 게임 루프 (`AnimationTimer`):
+** `frameCount`를 증가시키면서 게임 종료 조건을 확인합니다.
+** 조건이 충족되면 `gameFinished` 플래그를 설정해 루프를 멈춥니다.
+
+2. `showGameOverPopup` 메서드:
+** `Platform.runLater`를 사용해 JavaFX UI 스레드에서 팝업을 표시합니다.
+** `Alert` 팝업의 `OK` 버튼을 누르면 `Platform.exit()`를 호출해 애플리케이션을 종료합니다.
+
+3. 팝업 동작:
+** `AlertType.INFORMATION`을 사용해 간단한 메시지와 버튼을 표시.
+** `ButtonType.OK`를 사용해 확인 버튼만 포함.
+
+==== 결과
+- 300프레임 이후 팝업 창이 나타납니다.
+- 팝업 창에서 "OK" 버튼을 누르면 게임이 종료됩니다.
+
+==== 응용
+1. 조건을 변경:
+** 게임 점수, 시간 제한 또는 사용자 입력 조건에 따라 `gameFinished`를 설정.
+2. 팝업 디자인 변경:
+** 팝업 메시지나 스타일을 변경.
+3. 재시작 버튼 추가:
+** 팝업에서 "재시작"과 "종료" 버튼을 추가하여 사용자가 선택할 수 있도록 수정.

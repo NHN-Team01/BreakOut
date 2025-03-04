@@ -1,0 +1,178 @@
+= Paddle 클래스 구현
+
+`Paddle` 클래스는 플레이어가 조작하여 공을 튕겨내는 중요한 요소입니다. 이 클래스는 패들의 위치, 크기, 움직임을 관리하며, 키보드 입력을 처리해 패들이 좌우로 움직이게 합니다.
+
+[source,java]
+----
+package com.nhnacademy.brickbreaker;
+
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+
+public class Paddle {
+    private double x; // 패들의 중심 x 좌표
+    private double y; // 패들의 중심 y 좌표
+    private double width; // 패들의 너비
+    private double height; // 패들의 높이
+    private double speed; // 패들의 이동 속도
+    private Color color; // 패들의 색상
+
+    // 생성자
+    public Paddle(double x, double y, double width, double height, double speed, Color color) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.speed = speed;
+        this.color = color;
+    }
+
+    // 패들을 그리는 메서드
+    public void draw(GraphicsContext gc) {
+        gc.setFill(color);
+        gc.fillRect(x - width / 2, y - height / 2, width, height); // 중심을 기준으로 사각형 그리기
+    }
+
+    // 패들의 위치를 왼쪽으로 이동
+    public void moveLeft() {
+        x -= speed;
+    }
+
+    // 패들의 위치를 오른쪽으로 이동
+    public void moveRight() {
+        x += speed;
+    }
+
+    // 패들이 화면 경계를 벗어나지 않도록 제한
+    public void checkBounds(double canvasWidth) {
+        if (x - width / 2 < 0) { // 왼쪽 경계
+            x = width / 2;
+        } else if (x + width / 2 > canvasWidth) { // 오른쪽 경계
+            x = canvasWidth - width / 2;
+        }
+    }
+
+    // Getter와 Setter (필요 시 사용)
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+}
+----
+
+== Paddle 클래스 주요 기능
+1. 패들의 속성:
+** 위치 (`x`, `y`), 크기 (`width`, `height`), 이동 속도 (`speed`), 색상 (`color`) 관리.
+2. `draw` 메서드:
+** 패들을 `Canvas`에 그리기 위해 `GraphicsContext` 사용.
+3. `moveLeft`, `moveRight` 메서드:
+** 키보드 입력에 따라 패들의 위치를 변경.
+4. `checkBounds` 메서드:
+** 패들이 화면 밖으로 나가지 않도록 경계를 확인.
+
+== Paddle 클래스 활용 예제
+
+`Paddle` 클래스를 게임에 추가하고 키보드 입력으로 패들을 움직이는 코드입니다.
+
+[source,java]
+----
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+
+public class BrickBreakerApp extends Application {
+    private boolean moveLeft = false;
+    private boolean moveRight = false;
+
+    @Override
+    public void start(Stage primaryStage) {
+        // Canvas 생성
+        Canvas canvas = new Canvas(800, 600);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // Ball과 Paddle 생성
+        Ball ball = new Ball(400, 300, 10, 3, 3, Color.RED);
+        Paddle paddle = new Paddle(400, 550, 100, 20, 5, Color.BLUE);
+
+        // 게임 루프
+        AnimationTimer gameLoop = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                // 화면 초기화
+                gc.setFill(Color.BLACK);
+                gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+                // Ball 업데이트 및 그리기
+                ball.update();
+                ball.checkCollision(canvas.getWidth(), canvas.getHeight());
+                ball.draw(gc);
+
+                // Paddle 움직임 처리
+                if (moveLeft) {
+                    paddle.moveLeft();
+                }
+                if (moveRight) {
+                    paddle.moveRight();
+                }
+
+                // Paddle 경계 확인 및 그리기
+                paddle.checkBounds(canvas.getWidth());
+                paddle.draw(gc);
+            }
+        };
+        gameLoop.start();
+
+        // 키보드 입력 처리
+        Scene scene = new Scene(new StackPane(canvas), 800, 600);
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.LEFT) {
+                moveLeft = true;
+            } else if (event.getCode() == KeyCode.RIGHT) {
+                moveRight = true;
+            }
+        });
+
+        scene.setOnKeyReleased(event -> {
+            if (event.getCode() == KeyCode.LEFT) {
+                moveLeft = false;
+            } else if (event.getCode() == KeyCode.RIGHT) {
+                moveRight = false;
+            }
+        });
+
+        // Stage 설정
+        primaryStage.setTitle("Brick Breaker");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+----
+
+== 설명
+1. `moveLeft` 및 `moveRight` 변수:
+** 키보드 입력을 감지하여 패들의 움직임 상태를 관리합니다.
+2. `scene.setOnKeyPressed`와 `setOnKeyReleased`:
+** 키보드 이벤트를 통해 패들이 이동할 수 있도록 합니다.
+3. 경계 확인:
+** `checkBounds` 메서드를 통해 패들이 화면 밖으로 나가지 않게 제한합니다.

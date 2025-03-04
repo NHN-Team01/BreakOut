@@ -1,0 +1,151 @@
+= Ball 클래스 구현
+
+`Ball` 클래스는 벽돌 깨기 게임의 공을 나타내는 핵심 요소입니다. 공의 위치, 속도, 크기 등을 관리하며, `Canvas`에 공을 그리거나 업데이트하는 기능을 제공합니다.
+
+[source,java]
+----
+package com.nhnacademy.brickbreaker;
+
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+
+public class Ball {
+    private double x; // 공의 현재 x 좌표
+    private double y; // 공의 현재 y 좌표
+    private double radius; // 공의 반지름
+    private double dx; // 공의 x축 속도 (단위: 픽셀/프레임)
+    private double dy; // 공의 y축 속도 (단위: 픽셀/프레임)
+    private Color color; // 공의 색상
+
+    // 생성자
+    public Ball(double x, double y, double radius, double dx, double dy, Color color) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.dx = dx;
+        this.dy = dy;
+        this.color = color;
+    }
+
+    // 공을 그리는 메서드
+    public void draw(GraphicsContext gc) {
+        gc.setFill(color);
+        gc.fillOval(x - radius, y - radius, radius * 2, radius * 2); // 중심을 기준으로 원 그리기
+    }
+
+    // 공의 위치를 업데이트하는 메서드
+    public void update() {
+        x += dx; // x축 위치 업데이트
+        y += dy; // y축 위치 업데이트
+    }
+
+    // 공이 화면 경계와 충돌했는지 확인 및 속도 반전
+    public void checkCollision(double canvasWidth, double canvasHeight) {
+        // 좌우 경계 충돌
+        if (x - radius <= 0 || x + radius >= canvasWidth) {
+            dx = -dx; // x축 속도 반전
+        }
+        // 상하 경계 충돌
+        if (y - radius <= 0 || y + radius >= canvasHeight) {
+            dy = -dy; // y축 속도 반전
+        }
+    }
+
+    // Getter와 Setter (필요 시 사용)
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setDx(double dx) {
+        this.dx = dx;
+    }
+
+    public void setDy(double dy) {
+        this.dy = dy;
+    }
+}
+----
+
+== Ball 클래스 주요 기능
+1. 공의 속성:
+** 위치 (`x`, `y`), 반지름 (`radius`), 속도 (`dx`, `dy`), 색상 (`color`)을 관리.
+2. `draw` 메서드:
+** 공을 `Canvas`에 그리기 위해 `GraphicsContext`를 사용.
+3. `update` 메서드:
+** 공의 위치를 속도에 따라 업데이트.
+4. `checkCollision` 메서드:
+** 공이 화면 경계를 벗어나지 않도록 충돌을 감지하고 속도를 반전.
+
+== Ball 클래스 활용 예제
+
+`Ball` 클래스를 게임 루프에서 사용하는 코드입니다.
+
+[source,java]
+----
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+
+public class BrickBreakerApp extends Application {
+
+    @Override
+    public void start(Stage primaryStage) {
+        // Canvas 생성
+        Canvas canvas = new Canvas(800, 600);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // Ball 생성
+        Ball ball = new Ball(400, 300, 10, 3, 3, Color.RED);
+
+        // 게임 루프
+        AnimationTimer gameLoop = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                // 화면 초기화
+                gc.setFill(Color.BLACK);
+                gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+                // Ball 업데이트 및 그리기
+                ball.update();
+                ball.checkCollision(canvas.getWidth(), canvas.getHeight());
+                ball.draw(gc);
+            }
+        };
+        gameLoop.start();
+
+        // 레이아웃 설정
+        StackPane root = new StackPane();
+        root.getChildren().add(canvas);
+
+        Scene scene = new Scene(root, 800, 600);
+        primaryStage.setTitle("Brick Breaker");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+----
+
+== 설명
+1. Ball 인스턴스 생성:
+** 초기 위치 `(400, 300)`, 반지름 `10`, 속도 `(3, 3)`, 색상 `RED` 설정.
+2. AnimationTimer:
+** 게임 루프를 생성하여 공의 위치를 업데이트하고 다시 그립니다.
+3. 충돌 처리:
+** 화면 경계에 부딪힐 때 속도를 반전시킵니다.

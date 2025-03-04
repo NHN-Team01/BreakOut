@@ -1,0 +1,135 @@
+= 1. JavaFX 설정
+
+JavaFX를 프로젝트에서 사용하려면 몇 가지 설정 단계를 거쳐야 합니다.
+
+== 1.1 Maven 프로젝트 생성 및 JavaFX 의존성 추가
+Maven 프로젝트에서 JavaFX를 사용하려면, `pom.xml` 파일에 JavaFX 의존성을 추가해야 합니다. JavaFX는 OpenJFX 라이브러리를 사용하며, 플랫폼별 모듈을 명시적으로 포함해야 합니다.
+
+[source,xml]
+----
+<dependencies>
+    <!-- JavaFX 의존성 추가 -->
+    <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-controls</artifactId>
+        <version>17.0.13</version>
+    </dependency>
+    <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-graphics</artifactId>
+        <version>17.0.13</version>
+    </dependency>
+    <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-base</artifactId>
+        <version>17.0.13</version>
+    </dependency>
+</dependencies>
+----
+
+
+
+== 1.2 Maven 플러그인 설정
+JavaFX는 기본적으로 외부 모듈로 제공되므로, 실행 시 모듈 경로를 명시해야 합니다. 이를 위해 `maven-compiler-plugin`과 `maven-exec-plugin`을 설정합니다.
+
+[source,xml]
+----
+<build>
+    <plugins>
+        <!-- Maven Compiler Plugin -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.8.1</version>
+            <configuration>
+                <source>17</source>
+                <target>17</target>
+            </configuration>
+        </plugin>
+
+        <!-- Maven Exec Plugin -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+                <mainClass>com.nhnacademy.brickbreaker.Main</mainClass>
+                <arguments>
+                    <argument>--module-path</argument>
+                    <argument>${javafx.module.path}</argument>
+                    <argument>--add-modules</argument>
+                    <argument>javafx.controls,javafx.fxml</argument>
+                </arguments>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+----
+
+== 1.3 환경 변수 설정
+
+`pom.xml`에 JavaFX SDK 경로를 명시합니다. 플랫폼에 맞는 JavaFX 경로를 설정하세요.
+
+[source,xml]
+----
+<properties>
+    <javafx.module.path>/path/to/javafx-sdk-17.0.13/lib</javafx.module.path>
+</properties>
+----
+
+
+
+### 2. JavaFX 기본 클래스 생성
+JavaFX 애플리케이션은 `Application` 클래스를 확장해서 구현합니다.
+
+== 2.1 Main 클래스
+다음은 JavaFX의 기본 코드 예제입니다.
+
+[source,java]
+----
+package com.nhnacademy.brickbreaker;
+
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+
+public class Main extends Application {
+
+    @Override
+    public void start(Stage primaryStage) {
+        // 레이아웃 설정
+        StackPane root = new StackPane();
+
+        // Scene 생성
+        Scene scene = new Scene(root, 800, 600); // 800x600 크기의 게임 창
+
+        // Stage 설정
+        primaryStage.setTitle("Brick Breaker");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args); // JavaFX 애플리케이션 실행
+    }
+}
+----
+
+
+
+### 3. JavaFX 실행
+1. Maven 빌드: `mvn clean install`로 프로젝트를 빌드합니다.
+2. JavaFX 실행: `mvn exec:java` 명령어로 애플리케이션을 실행합니다.
+
+
+
+### 4. JavaFX 주요 구조 설명
+* `Stage`:
+** 응용 프로그램의 기본 창.
+** `primaryStage`는 애플리케이션에서 기본적으로 제공됩니다.
+* `Scene`:
+** UI 컴포넌트를 배치할 컨테이너.
+** `Scene`에 다양한 레이아웃 및 노드 추가 가능.
+* `Layout`:
+** `StackPane`, `VBox`, `HBox` 등 레이아웃을 관리하는 컨테이너.

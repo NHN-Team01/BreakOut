@@ -1,0 +1,171 @@
+= 1. 레이아웃의 개념
+
+JavaFX에서 레이아웃은 UI 컴포넌트의 위치와 크기를 관리하는 중요한 요소입니다. 벽돌 깨기 게임에서는 `Canvas`를 중심으로 레이아웃을 구성해야 합니다.
+JavaFX의 레이아웃은 화면 요소(노드)의 배치를 관리하는 컨테이너입니다. 게임에서는 `Canvas`를 중심으로 다른 UI 요소(점수 표시, 버튼 등)를 효율적으로 배치하려면 적절한 레이아웃을 선택해야 합니다.
+
+
+
+== 2. 주요 레이아웃 종류
+JavaFX는 다양한 레이아웃을 제공하며, 각 레이아웃은 특정한 배치 규칙을 가지고 있습니다. 아래는 주요 레이아웃입니다.
+
+1. `StackPane`:
+** 노드들을 겹치게 쌓는 구조.
+** `Canvas`와 오버레이(UI)를 함께 배치하기에 적합.
+2. `VBox`:
+** 노드들을 세로로 나란히 배치.
+** 상단에 점수 표시, 하단에 버튼 추가 등에 유용.
+3. `HBox`:
+** 노드들을 가로로 나란히 배치.
+** 여러 버튼이나 점수를 가로로 배치할 때 사용.
+4. `BorderPane`:
+** 상단, 하단, 왼쪽, 오른쪽, 중앙에 노드를 배치.
+** 게임 화면 중심(Center)에 `Canvas`를 배치하고, 상단(Top)에 점수 표시를 추가할 때 적합.
+5. `GridPane`:
+** 행과 열의 격자 구조.
+** 복잡한 UI 레이아웃을 구성할 때 유용.
+
+
+
+== 3. 벽돌 깨기 게임의 레이아웃 구성
+게임 화면을 `StackPane`으로 구성하고, 점수와 버튼 같은 요소를 다른 레이아웃에 추가해 통합하는 방식이 효과적입니다.
+
+
+
+=== 3.1 기본 레이아웃 구성
+
+`StackPane`을 사용하여 `Canvas`를 중앙에 배치하고, 오버레이로 UI 요소를 추가합니다.
+
+[source,java]
+----
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class GameApp extends Application {
+
+    @Override
+    public void start(Stage primaryStage) {
+        // Canvas 생성
+        Canvas canvas = new Canvas(800, 600);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // 기본 배경 설정
+        gc.setFill(javafx.scene.paint.Color.BLACK);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        // 점수 표시 라벨
+        Label scoreLabel = new Label("Score: 0");
+        scoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
+
+        // VBox에 점수 표시 추가
+        VBox uiOverlay = new VBox();
+        uiOverlay.getChildren().add(scoreLabel);
+        uiOverlay.setStyle("-fx-alignment: top-center; -fx-padding: 10;");
+
+        // StackPane에 Canvas와 UI 레이어 추가
+        StackPane root = new StackPane();
+        root.getChildren().addAll(canvas, uiOverlay);
+
+        // Scene 설정
+        Scene scene = new Scene(root, 800, 600);
+        primaryStage.setTitle("Brick Breaker");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+----
+
+==== 코드 설명:
+* `Canvas`:
+** 게임의 그래픽 요소를 그리는 주 화면입니다.
+* `Label`:
+** 점수 표시용 라벨을 생성했습니다.
+* `VBox`:
+** 점수 표시 UI를 수직으로 정렬하기 위해 사용합니다.
+* `StackPane`:
+** `Canvas`와 `VBox`를 겹쳐서 배치합니다.
+
+
+
+=== 3.2 BorderPane으로 구성하기
+점수를 상단에, 캔버스를 중앙에 배치하고, 하단에 버튼을 배치하려면 `BorderPane`을 사용합니다.
+
+[source,java]
+----
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+
+public class GameApp extends Application {
+
+    @Override
+    public void start(Stage primaryStage) {
+        // Canvas 생성
+        Canvas canvas = new Canvas(800, 600);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // 기본 배경 설정
+        gc.setFill(javafx.scene.paint.Color.BLACK);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        // 점수 표시 라벨
+        Label scoreLabel = new Label("Score: 0");
+        scoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
+
+        // 하단 버튼
+        Button restartButton = new Button("Restart");
+        restartButton.setStyle("-fx-font-size: 16px;");
+
+        // BorderPane에 요소 배치
+        BorderPane root = new BorderPane();
+        root.setTop(scoreLabel);  // 상단에 점수
+        root.setCenter(canvas);  // 중앙에 Canvas
+        root.setBottom(restartButton); // 하단에 버튼
+
+        // Scene 설정
+        Scene scene = new Scene(root, 800, 600);
+        primaryStage.setTitle("Brick Breaker");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+----
+
+==== 코드 설명:
+* `BorderPane`:
+** 상단(`setTop`)에 점수 라벨 배치.
+** 중앙(`setCenter`)에 `Canvas` 배치.
+** 하단(`setBottom`)에 재시작 버튼 배치.
+* 스타일 적용:
+** `setStyle` 메서드로 기본적인 폰트 크기와 색상을 설정.
+
+
+
+== 4. 레이아웃 선택 가이드
+* 간단한 구성:
+** `StackPane`을 사용하여 캔버스와 오버레이를 겹쳐 배치.
+* 다양한 UI 배치:
+** `BorderPane`을 사용하여 점수, 버튼 등을 명확히 배치.
+
+
+
+== 5. 레이아웃 확장
+추후 레벨 선택 화면, 게임 오버 화면 등 추가 UI가 필요할 경우, 각 화면에 적합한 레이아웃을 사용해 구성하면 됩니다. 필요하면 `Scene`을 전환하여 화면 전환도 구현할 수 있습니다.
