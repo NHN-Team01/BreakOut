@@ -49,7 +49,7 @@ public class Breakout extends Application {
             for (int col = 0; col < cols; col++) {
                 double x = startX + col * (brickWidth + padding);
                 double y = startY + row * (brickHeight + padding);
-                bricks.add(new Brick(x, y, brickWidth, brickHeight, Color.BLUE));
+                bricks.add(new Brick(x, y, brickWidth, brickHeight, (int) (Math.random()*5) + 1));
             }
         }
 

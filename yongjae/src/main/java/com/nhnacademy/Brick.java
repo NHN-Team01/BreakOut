@@ -10,14 +10,22 @@ public class Brick {
     private double height; // 벽돌의 높이
     private Color color; // 벽돌의 색상
     private boolean isDestroyed; // 벽돌이 파괴되었는지 여부
+    private int HP;
 
     // 생성자
-    public Brick(double x, double y, double width, double height, Color color) {
+    public Brick(double x, double y, double width, double height, int HP) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.color = color;
+        this.HP = HP;
+        switch (HP) {
+            case 1 -> color = Color.RED;
+            case 2 -> color = Color.ORANGE;
+            case 3 -> color = Color.YELLOW;
+            case 4 -> color = Color.GREEN;
+            case 5 -> color = Color.BLUE;
+        }
         this.isDestroyed = false; // 초기 상태는 파괴되지 않음
     }
 
@@ -46,7 +54,14 @@ public class Brick {
                 ballY - ballRadius < y + height;
 
         if (collision) {
-            isDestroyed = true; // 벽돌 파괴
+            HP--;
+            switch (HP) {
+                case 0 -> isDestroyed = true;
+                case 1 -> color = Color.RED;
+                case 2 -> color = Color.ORANGE;
+                case 3 -> color = Color.YELLOW;
+                case 4 -> color = Color.GREEN;
+            }
         }
 
         return collision;
