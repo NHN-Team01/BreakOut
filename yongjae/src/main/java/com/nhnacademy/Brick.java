@@ -3,21 +3,13 @@ package com.nhnacademy;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Brick {
-    protected double x; // 벽돌의 x 좌표
-    protected double y; // 벽돌의 y 좌표
-    protected double width; // 벽돌의 너비
-    protected double height; // 벽돌의 높이
-    protected Color color; // 벽돌의 색상
+public class Brick extends Rectangle {
     protected boolean isDestroyed; // 벽돌이 파괴되었는지 여부
     protected int HP;
 
     // 생성자
     public Brick(double x, double y, double width, double height, int HP) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        super(x, y, width, height);
         this.HP = HP;
         switch (HP) {
             case 1 -> color = Color.RED;
@@ -32,12 +24,12 @@ public class Brick {
     // 벽돌을 그리는 메서드
     public void draw(GraphicsContext gc) {
         if (!isDestroyed) {
-            gc.setFill(color);
-            gc.fillRect(x, y, width, height); // 벽돌 그리기
+            super.draw(gc);
         }
     }
 
     // 공과 충돌 여부 확인
+    @Override
     public boolean checkCollision(Ball ball) {
         if (isDestroyed) {
             return false; // 이미 파괴된 벽돌은 충돌하지 않음
@@ -63,7 +55,6 @@ public class Brick {
                 case 4 -> color = Color.GREEN;
             }
         }
-
         return collision;
     }
 
@@ -74,21 +65,5 @@ public class Brick {
 
     public void setDestroyed(boolean destroyed) {
         isDestroyed = destroyed;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
     }
 }
