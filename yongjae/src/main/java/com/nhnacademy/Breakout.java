@@ -55,6 +55,9 @@ public class Breakout extends Application {
                 if ((row == 3 && col == 2) || (row == 3 && col == 7)) {
                     bricks.get(row).add(new BombBrick(x, y, brickWidth, brickHeight));
                 }
+                else if (row == 4 && col == 4) {
+                    bricks.get(row).add(new PaddleLengthBrick(x, y, brickWidth, brickHeight));
+                }
                 else {
                     bricks.get(row).add(new Brick(x, y, brickWidth, brickHeight, (int) (Math.random()*5) + 1));
                 }
@@ -107,16 +110,10 @@ public class Breakout extends Application {
                         if (brick.checkCollision(ball)) {
                             ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
                             if (brick instanceof BombBrick) {
-                                for ( int k = 0; k < dy.length; k++) {
-                                    for (int l = 0; l < dy.length; l++) {
-                                        int ni = i + dy[k];
-                                        int nj = j + dy[l];
-                                        if (0 <= ni && 0<= nj && ni < rows && nj < cols) {
-                                            Brick b = bricks.get(ni).get(nj);
-                                            b.setDestroyed(true);
-                                        }
-                                    }
-                                }
+                                boomEffect(i, j, rows, cols, bricks);
+                            }
+                            else if (brick instanceof PaddleLengthBrick) {
+                                widePaddleEffect(paddle);
                             }
                         }
                         if (!brick.isDestroyed()) {
@@ -159,6 +156,23 @@ public class Breakout extends Application {
         primaryStage.setTitle("Brick Breaker");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private static void widePaddleEffect(Paddle paddle) {
+        paddle.setWidth(paddle.getWidth() * 2);
+    }
+
+    private void boomEffect(int i, int j, int rows, int cols, List<List<Brick>> bricks) {
+        for (int k = 0; k < dy.length; k++) {
+            for (int l = 0; l < dy.length; l++) {
+                int ni = i + dy[k];
+                int nj = j + dy[l];
+                if (0 <= ni && 0<= nj && ni < rows && nj < cols) {
+                    Brick b = bricks.get(ni).get(nj);
+                    b.setDestroyed(true);
+                }
+            }
+        }
     }
 
     private void showGameOverPopup() {
