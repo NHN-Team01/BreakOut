@@ -60,6 +60,7 @@ public class Breakout extends Application {
                 if (gameStop) {
                     return;
                 }
+                int brickCount = 0;
                 // 화면 초기화
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -96,7 +97,14 @@ public class Breakout extends Application {
                     if (brick.checkCollision(ball)) {
                         ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
                     }
+                    if (!brick.isDestroyed()) {
+                        brickCount++;
+                    }
                     brick.draw(gc);
+                }
+                if (brickCount == 0) {
+                    gameStop = true;
+                    showGameClearPopup();
                 }
             }
         };
@@ -134,6 +142,21 @@ public class Breakout extends Application {
         Platform.runLater(() -> {
             Alert alert = new Alert(AlertType.INFORMATION, "Game Over! Thank you for playing.", ButtonType.OK);
             alert.setTitle("Game Over");
+            alert.setHeaderText(null);
+
+            // 팝업 닫기 후 게임 종료
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.OK) {
+                    Platform.exit(); // 게임 종료
+                }
+            });
+        });
+    }
+
+    private void showGameClearPopup() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(AlertType.INFORMATION, "Game Clear! Thank you for playing.", ButtonType.OK);
+            alert.setTitle("Game Clear");
             alert.setHeaderText(null);
 
             // 팝업 닫기 후 게임 종료
