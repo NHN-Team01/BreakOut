@@ -22,6 +22,8 @@ public class Breakout extends Application {
     private boolean moveRight = false;
     private AnimationTimer gameLoop;
     private boolean gameStop = false;
+    private int[] dy = {-1 , 0 , 1};
+    private int[] dx = {-1 , 0 , 1};
 
     @Override
     public void start(Stage primaryStage) {
@@ -36,7 +38,7 @@ public class Breakout extends Application {
         Paddle paddle = new Paddle(400, 550, 100, 20, 5, Color.BLUE);
 
         // 벽돌 생성
-        List<Brick> bricks = new ArrayList<>();
+        List<List<Brick>> bricks = new ArrayList<>();
         int rows = 5;
         int cols = 10;
         double brickWidth = 70;
@@ -46,10 +48,16 @@ public class Breakout extends Application {
         double startY = 50;
 
         for (int row = 0; row < rows; row++) {
+            bricks.add(new ArrayList<>());
             for (int col = 0; col < cols; col++) {
                 double x = startX + col * (brickWidth + padding);
                 double y = startY + row * (brickHeight + padding);
-                bricks.add(new Brick(x, y, brickWidth, brickHeight, (int) (Math.random()*5) + 1));
+                if ((row == 3 && col == 2) || (row == 3 && col == 7)) {
+                    bricks.get(row).add(new BoomBrick(x, y, brickWidth, brickHeight));
+                }
+                else {
+                    bricks.get(row).add(new Brick(x, y, brickWidth, brickHeight, (int) (Math.random()*5) + 1));
+                }
             }
         }
 
@@ -93,14 +101,29 @@ public class Breakout extends Application {
                 }
 
                 // 벽돌 그리기 및 충돌 처리
-                for (Brick brick : bricks) {
-                    if (brick.checkCollision(ball)) {
-                        ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
+                for (int i = 0; i < bricks.size(); i++) {
+                    for (int j = 0; j < bricks.get(i).size(); j++) {
+                        Brick brick = bricks.get(i).get(j);
+                        if (brick.checkCollision(ball)) {
+                            ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
+                            if (brick instanceof BoomBrick) {
+                                for ( int k = 0; k < dy.length; k++) {
+                                    for (int l = 0; l < dy.length; l++) {
+                                        int ni = i + dy[k];
+                                        int nj = j + dy[l];
+                                        if (0 <= ni && 0<= nj && ni < rows && nj < cols) {
+                                            Brick b = bricks.get(ni).get(nj);
+                                            b.setDestroyed(true);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (!brick.isDestroyed()) {
+                            brickCount++;
+                        }
+                        brick.draw(gc);
                     }
-                    if (!brick.isDestroyed()) {
-                        brickCount++;
-                    }
-                    brick.draw(gc);
                 }
                 if (brickCount == 0) {
                     gameStop = true;

@@ -4,13 +4,13 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Brick {
-    private double x; // 벽돌의 x 좌표
-    private double y; // 벽돌의 y 좌표
-    private double width; // 벽돌의 너비
-    private double height; // 벽돌의 높이
-    private Color color; // 벽돌의 색상
-    private boolean isDestroyed; // 벽돌이 파괴되었는지 여부
-    private int HP;
+    protected double x; // 벽돌의 x 좌표
+    protected double y; // 벽돌의 y 좌표
+    protected double width; // 벽돌의 너비
+    protected double height; // 벽돌의 높이
+    protected Color color; // 벽돌의 색상
+    protected boolean isDestroyed; // 벽돌이 파괴되었는지 여부
+    protected int HP;
 
     // 생성자
     public Brick(double x, double y, double width, double height, int HP) {
@@ -70,6 +70,10 @@ public class Brick {
     // Getter와 Setter (필요 시 사용)
     public boolean isDestroyed() {
         return isDestroyed;
+    }
+
+    public void setDestroyed(boolean destroyed) {
+        isDestroyed = destroyed;
     }
 
     public double getX() {
