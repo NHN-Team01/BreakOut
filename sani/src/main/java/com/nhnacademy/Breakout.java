@@ -1,8 +1,6 @@
 package com.nhnacademy;
 
-import com.nhnacademy.shapes.Ball;
-import com.nhnacademy.shapes.Brick;
-import com.nhnacademy.shapes.Paddle;
+import com.nhnacademy.shapes.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -21,6 +19,7 @@ public class Breakout extends Application {
     private boolean moveRight = false;
     private AnimationTimer gameLoop;
     private boolean gameStop = false;
+    private List<Shape> shapes = new ArrayList<>();
 
     @Override
     public void start(Stage primaryStage) {
@@ -30,12 +29,12 @@ public class Breakout extends Application {
 
         // Ball 생성
         Ball ball = new Ball(400, 300, 10, 3, 3, Color.RED);
-
+        shapes.add(ball);
         // Paddle 생성
         Paddle paddle = new Paddle(400, 550, 100, 20, 5, Color.BLUE);
+        shapes.add(paddle);
 
         // 벽돌 생성
-        List<Brick> bricks = new ArrayList<>();
         int rows = 5;
         int cols = 10;
         double brickWidth = 70;
@@ -48,7 +47,7 @@ public class Breakout extends Application {
             for (int col = 0; col < cols; col++) {
                 double x = startX + col * (brickWidth + padding);
                 double y = startY + row * (brickHeight + padding);
-                bricks.add(new Brick(x, y, brickWidth, brickHeight, Color.BLUE));
+                shapes.add(new Brick(x, y, brickWidth, brickHeight, Color.BLUE));
             }
         }
 
@@ -66,7 +65,6 @@ public class Breakout extends Application {
                 // Ball 업데이트 및 그리기
                 ball.update();
                 ball.checkCollision(canvas.getWidth(), canvas.getHeight());
-                ball.draw(gc);
 
                 // Paddle 움직임 처리
                 if (moveLeft) {
@@ -78,18 +76,20 @@ public class Breakout extends Application {
 
                 // Paddle 경계 확인 및 그리기
                 paddle.checkBounds(canvas.getWidth());
-                paddle.draw(gc);
 
                 if (paddle.checkCollision(ball)) {
                     ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
                 }
 
-                // 벽돌 그리기 및 충돌 처리
-                for (Brick brick : bricks) {
-                    if (brick.checkCollision(ball)) {
-                        ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
+                for (Shape shape : shapes) {
+                    if (shape instanceof Drawable drawable) {
+                        drawable.draw(gc);
                     }
-                    brick.draw(gc);
+                    if (shape instanceof Brick brick) {
+                        if(brick.checkCollision(ball)){
+                            ball.setDy(-ball.getDy());
+                        }
+                    }
                 }
             }
         };

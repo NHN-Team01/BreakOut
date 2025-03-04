@@ -3,7 +3,7 @@ package com.nhnacademy.shapes;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Brick extends Rectangle {
+public class Brick extends Rectangle implements Drawable {
     private Color color; // 벽돌의 색상
     private boolean isDestroyed; // 벽돌이 파괴되었는지 여부
 
@@ -14,7 +14,7 @@ public class Brick extends Rectangle {
         this.isDestroyed = false; // 초기 상태는 파괴되지 않음
     }
 
-    // 벽돌을 그리는 메서드
+    @Override
     public void draw(GraphicsContext gc) {
         if (!isDestroyed) {
             gc.setFill(color);

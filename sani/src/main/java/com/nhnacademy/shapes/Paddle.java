@@ -3,7 +3,7 @@ package com.nhnacademy.shapes;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Paddle extends Rectangle{
+public class Paddle extends Rectangle implements Drawable{
     private double speed; // 패들의 이동 속도
     private Color color; // 패들의 색상
 
@@ -14,7 +14,7 @@ public class Paddle extends Rectangle{
         this.color = color;
     }
 
-    // 패들을 그리는 메서드
+    @Override
     public void draw(GraphicsContext gc) {
         gc.setFill(color);
         gc.fillRect(x - width / 2, y - height / 2, width, height); // 중심을 기준으로 사각형 그리기
