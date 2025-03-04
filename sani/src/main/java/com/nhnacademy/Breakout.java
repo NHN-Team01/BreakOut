@@ -1,14 +1,13 @@
 package com.nhnacademy;
 
+import com.nhnacademy.shapes.Ball;
+import com.nhnacademy.shapes.Brick;
+import com.nhnacademy.shapes.Paddle;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;

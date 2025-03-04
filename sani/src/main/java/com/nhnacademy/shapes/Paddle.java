@@ -1,22 +1,15 @@
-package com.nhnacademy;
+package com.nhnacademy.shapes;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Paddle {
-    private double x; // 패들의 중심 x 좌표
-    private double y; // 패들의 중심 y 좌표
-    private double width; // 패들의 너비
-    private double height; // 패들의 높이
+public class Paddle extends Rectangle{
     private double speed; // 패들의 이동 속도
     private Color color; // 패들의 색상
 
     // 생성자
     public Paddle(double x, double y, double width, double height, double speed, Color color) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        super(x, y, width, height);
         this.speed = speed;
         this.color = color;
     }
@@ -54,20 +47,4 @@ public class Paddle {
         }
     }
 
-    // Getter와 Setter (필요 시 사용)
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
 }

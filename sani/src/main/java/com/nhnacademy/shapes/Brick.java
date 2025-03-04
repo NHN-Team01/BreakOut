@@ -1,22 +1,15 @@
-package com.nhnacademy;
+package com.nhnacademy.shapes;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Brick {
-    private double x; // 벽돌의 x 좌표
-    private double y; // 벽돌의 y 좌표
-    private double width; // 벽돌의 너비
-    private double height; // 벽돌의 높이
+public class Brick extends Rectangle {
     private Color color; // 벽돌의 색상
     private boolean isDestroyed; // 벽돌이 파괴되었는지 여부
 
     // 생성자
     public Brick(double x, double y, double width, double height, Color color) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        super(x, y, width, height);
         this.color = color;
         this.isDestroyed = false; // 초기 상태는 파괴되지 않음
     }
@@ -52,24 +45,8 @@ public class Brick {
         return collision;
     }
 
-    // Getter와 Setter (필요 시 사용)
     public boolean isDestroyed() {
         return isDestroyed;
     }
 
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
 }
