@@ -30,7 +30,7 @@ public class Breakout extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         // Ball 생성
-        Ball ball = new Ball(400, 300, 10, 3, 3, Color.RED);
+        Ball ball = new Ball(400, 300, 10, 3, -3, Color.RED);
 
         // Paddle 생성
         Paddle paddle = new Paddle(400, 550, 100, 20, 5, Color.BLUE);
@@ -68,6 +68,12 @@ public class Breakout extends Application {
                 ball.update();
                 ball.checkCollision(canvas.getWidth(), canvas.getHeight());
                 ball.draw(gc);
+
+                // 패배 조건
+                if (ball.getY() + ball.getRadius() >= canvas.getHeight()) {
+                    gameStop = true;
+                    showGameOverPopup(); // 팝업 출력
+                }
 
                 // Paddle 움직임 처리
                 if (moveLeft) {
@@ -122,6 +128,21 @@ public class Breakout extends Application {
         primaryStage.setTitle("Brick Breaker");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private void showGameOverPopup() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(AlertType.INFORMATION, "Game Over! Thank you for playing.", ButtonType.OK);
+            alert.setTitle("Game Over");
+            alert.setHeaderText(null);
+
+            // 팝업 닫기 후 게임 종료
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.OK) {
+                    Platform.exit(); // 게임 종료
+                }
+            });
+        });
     }
 
     public static void main(String[] args) {

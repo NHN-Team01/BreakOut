@@ -40,7 +40,7 @@ public class Ball {
             dx = -dx; // x축 속도 반전
         }
         // 상하 경계 충돌
-        if (y - radius <= 0 || y + radius >= canvasHeight) {
+        if (y - radius <= 0) {
             dy = -dy; // y축 속도 반전
         }
     }
