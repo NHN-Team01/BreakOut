@@ -7,7 +7,7 @@ public class PaddleLengthBrick extends Brick {
     // 생성자
     public PaddleLengthBrick(double x, double y, double width, double height) {
         super(x, y, width, height, 1);
-        this.color = Color.GOLD;
+        this.color = Color.LIGHTPINK;
         this.HP = 1;
     }
 }
