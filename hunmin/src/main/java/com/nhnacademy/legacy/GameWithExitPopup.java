@@ -1,4 +1,4 @@
-package com.nhnacademy;
+package com.nhnacademy.legacy;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
