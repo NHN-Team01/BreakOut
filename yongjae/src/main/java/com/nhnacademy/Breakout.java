@@ -35,6 +35,8 @@ public class Breakout extends Application {
     public void start(Stage primaryStage) {
         gameStop = false;
         score = 0;
+        moveLeft = false;
+        moveRight = false;
 
         // Canvas 생성
         if (canvas == null) {
