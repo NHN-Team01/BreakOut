@@ -3,7 +3,7 @@ package com.nhnacademy;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Paddle extends Rectangle implements Movable {
+public class Paddle extends Rectangle implements Movable, Collidable {
     private double speed;   // 패들 속도
     private double dx = 0;      // X 방향 이동속도
     private final double dy = 0;  // Y 방향 이동속도 (패들은 Y 방향으로는 이동하지 않으므로 0)
@@ -31,12 +31,28 @@ public class Paddle extends Rectangle implements Movable {
         dx = speed;
     }
 
-    public boolean checkCollision(Ball ball) {
+    @Override
+    public boolean isCollisionDetected(Shape other) {
+        // Ball과의 충돌만 고려하면 됨
+        if(!(other instanceof Ball)) {
+            return false;
+        }
+        Ball ball = (Ball)other;
+        
         // 공이 패들의 경계와 충돌했는지 확인
-        return ball.getX() + ball.getRadius() > x &&
-                ball.getX() - ball.getRadius() < x + width &&
-                ball.getY() + ball.getRadius() > y &&
-                ball.getY() - ball.getRadius() < y + height;
+        boolean collision = ball.getX() + ball.getRadius() > x &&
+                            ball.getX() - ball.getRadius() < x + width &&
+                            ball.getY() + ball.getRadius() > y &&
+                            ball.getY() - ball.getRadius() < y + height;
+
+        if(collision) {
+            // 두 객체가 겹치지 않게 충돌하지 않는 가장 가까운 위치로 이동
+            // (문제를 단순화 시키기 위해 충돌 시 이전 자리로 이동)
+            ball.setDx(-ball.getDx()); ball.setDy(-ball.getDy());
+            ball.move();
+            ball.setDx(-ball.getDx()); ball.setDy(-ball.getDy());
+        }
+        return collision;
     }
 
     // 패들이 화면 경계를 벗어나지 않도록 제한
