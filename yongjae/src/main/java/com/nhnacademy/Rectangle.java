@@ -3,7 +3,7 @@ package com.nhnacademy;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public abstract class Rectangle {
+public abstract class Rectangle extends Shape {
     protected double x; // 벽돌의 x 좌표
     protected double y; // 벽돌의 y 좌표
     protected double width; // 벽돌의 너비
@@ -16,12 +16,6 @@ public abstract class Rectangle {
         this.y = y;
         this.width = width;
         this.height = height;
-    }
-
-    // 벽돌을 그리는 메서드
-    public void draw(GraphicsContext gc) {
-        gc.setFill(color);
-        gc.fillRect(x, y, width, height); // 벽돌 그리기
     }
 
     // 공과 충돌 여부 확인

@@ -1,8 +1,9 @@
 package com.nhnacademy;
 
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Paddle extends Rectangle {
+public class Paddle extends Rectangle implements Drawable {
     private double speed; // 패들의 이동 속도
 
     // 생성자
@@ -11,6 +12,14 @@ public class Paddle extends Rectangle {
         this.speed = speed;
         this.color = color;
     }
+
+    // 벽돌을 그리는 메서드
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.setFill(color);
+        gc.fillRect(x, y, width, height); // 벽돌 그리기
+    }
+
 
     // 패들의 위치를 왼쪽으로 이동
     public void moveLeft() {
