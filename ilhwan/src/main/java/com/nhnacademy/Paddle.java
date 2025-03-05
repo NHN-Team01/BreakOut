@@ -39,11 +39,15 @@ public class Paddle extends Rectangle implements Movable, Collidable {
         }
         Ball ball = (Ball)other;
         
-        // 공이 패들의 경계와 충돌했는지 확인
-        boolean collision = ball.getX() + ball.getRadius() > x &&
-                            ball.getX() - ball.getRadius() < x + width &&
-                            ball.getY() + ball.getRadius() > y &&
-                            ball.getY() - ball.getRadius() < y + height;
+        double closestX = clamp(ball.getX(), x, x + width);  // 공의 X좌표와 사각형의 X경계 사이의 값
+        double closestY = clamp(ball.getY(), y, y + height); // 공의 Y좌표와 사각형의 Y경계 사이의 값
+
+        // 공의 중심과 사각형과의 가장 가까운 점 간의 거리를 계산
+        double dx = ball.getX() - closestX;
+        double dy = ball.getY() - closestY;
+
+        // 거리가 공의 반지름보다 작으면 충돌
+        boolean collision = (dx * dx + dy * dy) < (ball.getRadius() * ball.getRadius());
 
         if(collision) {
             // 두 객체가 겹치지 않게 충돌하지 않는 가장 가까운 위치로 이동
@@ -53,6 +57,17 @@ public class Paddle extends Rectangle implements Movable, Collidable {
             ball.setDx(-ball.getDx()); ball.setDy(-ball.getDy());
         }
         return collision;
+    }
+
+    /**
+     * 주어진 값을 특정 범위 내로 제한하는 함수
+     * @param value 제한할 값
+     * @param min 값의 최소값
+     * @param max 값의 최대값
+     * @return 제한된 값 (value가 min가 max 사이에 위치)
+     */
+    private double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
     }
 
     // 패들이 화면 경계를 벗어나지 않도록 제한
