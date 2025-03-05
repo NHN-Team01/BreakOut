@@ -1,25 +1,16 @@
 package com.nhnacademy;
 
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Ball extends Circle {
     private double dx; // 공의 x축 속도 (단위: 픽셀/프레임)
     private double dy; // 공의 y축 속도 (단위: 픽셀/프레임)
-    private Color color; // 공의 색상
 
     // 생성자
     public Ball(double x, double y, double radius, double dx, double dy, Color color) {
-        super(x, y, radius);
+        super(x, y, radius, color);
         this.dx = dx;
         this.dy = dy;
-        this.color = color;
-    }
-
-    // 공을 그리는 메서드
-    public void draw(GraphicsContext gc) {
-        gc.setFill(color);
-        gc.fillOval(x - radius, y - radius, radius * 2, radius * 2); // 중심을 기준으로 원 그리기
     }
 
     // 공의 위치를 업데이트하는 메서드
