@@ -3,19 +3,14 @@ package com.nhnacademy;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Ball {
-    private double x; // 공의 현재 x 좌표
-    private double y; // 공의 현재 y 좌표
-    private double radius; // 공의 반지름
+public class Ball extends Circle {
     private double dx; // 공의 x축 속도 (단위: 픽셀/프레임)
     private double dy; // 공의 y축 속도 (단위: 픽셀/프레임)
     private Color color; // 공의 색상
 
     // 생성자
     public Ball(double x, double y, double radius, double dx, double dy, Color color) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
+        super(x, y, radius);
         this.dx = dx;
         this.dy = dy;
         this.color = color;
@@ -43,19 +38,6 @@ public class Ball {
         if (y - radius <= 0 || y + radius >= canvasHeight) {
             dy = -dy; // y축 속도 반전
         }
-    }
-
-    // Getter와 Setter (필요 시 사용)
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public double getRadius() {
-        return radius;
     }
 
     public double getDx() {
