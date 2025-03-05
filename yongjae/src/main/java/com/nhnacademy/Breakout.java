@@ -46,11 +46,15 @@ public class Breakout extends Application {
 
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
+        List<Shape> shapes = new ArrayList<>();
+
         // Ball 생성
         Ball ball = new Ball(400, 300, 10, 3, -3, Color.RED);
+        shapes.add(ball);
 
         // Paddle 생성
         Paddle paddle = new Paddle(400, 550, 100, 20, 5, Color.BLUE);
+        shapes.add(paddle);
 
         // 벽돌 생성
         List<List<Brick>> bricks = new ArrayList<>();
@@ -67,15 +71,20 @@ public class Breakout extends Application {
             for (int col = 0; col < cols; col++) {
                 double x = startX + col * (brickWidth + padding);
                 double y = startY + row * (brickHeight + padding);
+                Brick temp;
                 if ((row == 3 && col == 2) || (row == 3 && col == 7)) {
-                    bricks.get(row).add(new BombBrick(x, y, brickWidth, brickHeight));
+                    temp = new BombBrick(x, y, brickWidth, brickHeight);
+                    bricks.get(row).add(temp);
                 }
                 else if (row == 4 && col == 4) {
-                    bricks.get(row).add(new PaddleLengthBrick(x, y, brickWidth, brickHeight));
+                    temp = new PaddleLengthBrick(x, y, brickWidth, brickHeight);
+                    bricks.get(row).add(temp);
                 }
                 else {
-                    bricks.get(row).add(new Brick(x, y, brickWidth, brickHeight, (int) (Math.random()*5) + 1));
+                    temp = new Brick(x, y, brickWidth, brickHeight, (int) (Math.random()*5) + 1);
+                    bricks.get(row).add(temp);
                 }
+                shapes.add(temp);
             }
         }
 
@@ -98,7 +107,6 @@ public class Breakout extends Application {
                 // Ball 업데이트 및 그리기
                 ball.update();
                 ball.checkCollision(canvas.getWidth(), canvas.getHeight());
-                ball.draw(gc);
 
                 // 패배 조건
                 if (ball.getY() + ball.getRadius() >= canvas.getHeight()) {
@@ -116,7 +124,6 @@ public class Breakout extends Application {
 
                 // Paddle 경계 확인 및 그리기
                 paddle.checkBounds(canvas.getWidth());
-                paddle.draw(gc);
 
                 if (paddle.checkCollision(ball)) {
                     ball.setDy(-Math.abs(ball.getDy())); // 충돌 시 공의 y 방향 반전
@@ -141,7 +148,12 @@ public class Breakout extends Application {
                         if (!brick.isDestroyed()) {
                             brickCount++;
                         }
-                        brick.draw(gc);
+                    }
+                }
+                for (Shape shape : shapes) {
+                    if (shape instanceof Drawable) {
+                        Drawable drawable = (Drawable) shape;
+                        drawable.draw(gc);
                     }
                 }
                 if (brickCount == 0) {
