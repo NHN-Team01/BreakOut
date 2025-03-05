@@ -8,12 +8,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -29,12 +27,22 @@ public class Breakout extends Application {
     private int[] dx = {-1 , 0 , 1};
     int score = 0;
     Label scoreLabel = new Label();
+    private Canvas canvas;
+    private GraphicsContext gc;
+
 
     @Override
     public void start(Stage primaryStage) {
+        gameStop = false;
+        score = 0;
+
         // Canvas 생성
-        Canvas canvas = new Canvas(800, 600);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+        if (canvas == null) {
+            canvas = new Canvas(800, 600);  // Canvas 객체가 없으면 새로 생성
+        }
+        gc = canvas.getGraphicsContext2D();
+
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         // Ball 생성
         Ball ball = new Ball(400, 300, 10, 3, -3, Color.RED);
@@ -69,6 +77,10 @@ public class Breakout extends Application {
             }
         }
 
+        if (gameLoop != null) {
+            gameLoop.stop();
+        }
+
         // 게임 루프
         gameLoop = new AnimationTimer() {
             @Override
@@ -89,7 +101,7 @@ public class Breakout extends Application {
                 // 패배 조건
                 if (ball.getY() + ball.getRadius() >= canvas.getHeight()) {
                     gameStop = true;
-                    showGameOverPopup(); // 팝업 출력
+                    showGameOverPopup(primaryStage); // 팝업 출력
                 }
 
                 // Paddle 움직임 처리
@@ -105,7 +117,7 @@ public class Breakout extends Application {
                 paddle.draw(gc);
 
                 if (paddle.checkCollision(ball)) {
-                    ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
+                    ball.setDy(-Math.abs(ball.getDy())); // 충돌 시 공의 y 방향 반전
                 }
 
                 // 벽돌 그리기 및 충돌 처리
@@ -197,15 +209,23 @@ public class Breakout extends Application {
         }
     }
 
-    private void showGameOverPopup() {
+    private void showGameOverPopup(Stage primaryStage) {
         Platform.runLater(() -> {
-            Alert alert = new Alert(AlertType.INFORMATION, "Game Over! Thank you for playing.", ButtonType.OK);
+            Alert alert = new Alert(AlertType.INFORMATION, "Game Over! Thank you for playing.");
             alert.setTitle("Game Over");
             alert.setHeaderText(null);
 
+            ButtonType restart = new ButtonType("재시작");
+            ButtonType exit = new ButtonType("종료");
+
+            alert.getButtonTypes().setAll(restart, exit);
+
             // 팝업 닫기 후 게임 종료
             alert.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.OK) {
+                if (response == restart) {
+                    start(primaryStage);
+                }
+                else if (response == exit) {
                     Platform.exit(); // 게임 종료
                 }
             });
