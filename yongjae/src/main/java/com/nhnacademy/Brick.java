@@ -3,7 +3,7 @@ package com.nhnacademy;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Brick extends Rectangle implements Drawable {
+public class Brick extends Rectangle implements Drawable, Breakable {
     protected boolean isDestroyed; // 벽돌이 파괴되었는지 여부
     protected int HP;
     protected int score;
@@ -32,35 +32,6 @@ public class Brick extends Rectangle implements Drawable {
         }
     }
 
-    // 공과 충돌 여부 확인
-    public boolean checkCollision(Ball ball) {
-        if (isDestroyed) {
-            return false; // 이미 파괴된 벽돌은 충돌하지 않음
-        }
-
-        double ballX = ball.getX();
-        double ballY = ball.getY();
-        double ballRadius = ball.getRadius();
-
-        // 공이 벽돌의 경계와 충돌했는지 확인
-        boolean collision = ballX + ballRadius > x &&
-                ballX - ballRadius < x + width &&
-                ballY + ballRadius > y &&
-                ballY - ballRadius < y + height;
-
-        if (collision) {
-            HP--;
-            switch (HP) {
-                case 0 -> isDestroyed = true;
-                case 1 -> color = Color.RED;
-                case 2 -> color = Color.ORANGE;
-                case 3 -> color = Color.YELLOW;
-                case 4 -> color = Color.GREEN;
-            }
-        }
-        return collision;
-    }
-
     // Getter와 Setter (필요 시 사용)
     public boolean isDestroyed() {
         return isDestroyed;
@@ -71,4 +42,16 @@ public class Brick extends Rectangle implements Drawable {
     }
 
     public int getScore() {return score;}
+
+    @Override
+    public void crash() {
+        HP--;
+        switch (HP) {
+            case 0 -> isDestroyed = true;
+            case 1 -> color = Color.RED;
+            case 2 -> color = Color.ORANGE;
+            case 3 -> color = Color.YELLOW;
+            case 4 -> color = Color.GREEN;
+        }
+    }
 }

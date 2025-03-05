@@ -140,17 +140,23 @@ public class Breakout extends Application {
                 }
 
                 // Paddle 경계 확인 및 그리기
-                paddle.checkBounds(canvas.getWidth());
+                if (paddle.isCollisionDetected(walls[1])){
+                    paddle.setX(walls[1].getX());
+                }
+                if (paddle.isCollisionDetected(walls[2])){
+                    paddle.setX(walls[2].getX() - paddle.getWidth());
+                }
 
                 if (paddle.isCollisionDetected(ball)) {
-                    ball.setDy(-Math.abs(ball.getDy())); // 충돌 시 공의 y 방향 반전
+                    ball.bounce(paddle); // 충돌 시 공의 y 방향 반전
                 }
 
                 // 벽돌 그리기 및 충돌 처리
                 for (int i = 0; i < bricks.size(); i++) {
                     for (int j = 0; j < bricks.get(i).size(); j++) {
                         Brick brick = bricks.get(i).get(j);
-                        if (brick.checkCollision(ball)) {
+                        if (ball.isCollisionDetected(brick)) {
+                            brick.crash();
                             if (brick.isDestroyed) {
                                 updateScore(brick);
                             }

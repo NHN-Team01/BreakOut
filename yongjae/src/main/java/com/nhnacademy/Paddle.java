@@ -20,19 +20,13 @@ public class Paddle extends Rectangle implements Drawable, Movable {
         gc.fillRect(x, y, width, height); // 벽돌 그리기
     }
 
-
-    // 패들이 화면 경계를 벗어나지 않도록 제한
-    public void checkBounds(double canvasWidth) {
-        if (x < 0) { // 왼쪽 경계
-            x = 0;
-        } else if (x + width > canvasWidth) { // 오른쪽 경계
-            x = canvasWidth - width;
-        }
-    }
-
     // Getter와 Setter (필요 시 사용)
     public void setWidth(double width) {
         this.width = width;
+    }
+
+    public void setX(double x) {
+        this.x = x;
     }
 
     @Override

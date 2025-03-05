@@ -75,7 +75,7 @@ public class Ball extends Circle implements Drawable, Movable, Bounceable {
         }
         else if (other instanceof Brick) {
             Brick brick = (Brick) other;
-
+            if (brick.isDestroyed) return false;
             // 공이 벽돌의 경계와 충돌했는지 확인
             return ballX + ballRadius > brick.x &&
                     ballX - ballRadius < brick.x + brick.width &&
