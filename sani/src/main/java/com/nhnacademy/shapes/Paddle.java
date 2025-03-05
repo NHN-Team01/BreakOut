@@ -3,15 +3,20 @@ package com.nhnacademy.shapes;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Paddle extends Rectangle implements Drawable{
+public class Paddle extends Rectangle implements Drawable, Movable{
     private double speed; // 패들의 이동 속도
     private Color color; // 패들의 색상
+    private double dx;
+    private boolean paused;
+    private double prevX;
 
     // 생성자
     public Paddle(double x, double y, double width, double height, double speed, Color color) {
         super(x, y, width, height);
         this.speed = speed;
         this.color = color;
+        this.paused = false;
+        this.dx = 0;
     }
 
     @Override
@@ -22,20 +27,12 @@ public class Paddle extends Rectangle implements Drawable{
 
     // 패들의 위치를 왼쪽으로 이동
     public void moveLeft() {
-        x -= speed;
+        setDx(-speed);
     }
 
     // 패들의 위치를 오른쪽으로 이동
     public void moveRight() {
-        x += speed;
-    }
-
-    public boolean checkCollision(Ball ball) {
-        // 공이 패들의 경계와 충돌했는지 확인
-        return ball.getX() + ball.getRadius() > x &&
-                ball.getX() - ball.getRadius() < x + width &&
-                ball.getY() + ball.getRadius() > y &&
-                ball.getY() - ball.getRadius() < y + height;
+        setDx(speed);
     }
 
     // 패들이 화면 경계를 벗어나지 않도록 제한
@@ -47,4 +44,54 @@ public class Paddle extends Rectangle implements Drawable{
         }
     }
 
+    @Override
+    public void move() {
+        if(!paused) {
+            prevX = x;
+            x += dx;
+        }
+    }
+
+    @Override
+    public void revertPosition() {
+        x = prevX;
+    }
+
+    @Override
+    public double getDy() {
+        return 0;
+    }
+
+    @Override
+    public void setDy(double dy) {
+
+    }
+
+    @Override
+    public double getDx() {
+        return dx;
+    }
+
+    @Override
+    public void setDx(double dx) {
+        this.dx = dx;
+    }
+
+    @Override
+    public void pause() {
+        paused = true;
+    }
+
+    @Override
+    public void resume() {
+        paused = false;
+    }
+
+    @Override
+    public boolean isCollisionDetected(Shape other) {
+        return other.getMinX() < getMaxX() &&
+                other.getMaxX() > getMinX() &&
+                other.getMinY() < getMaxY() &&
+                other.getMaxY() > getMinY();
+    }
 }

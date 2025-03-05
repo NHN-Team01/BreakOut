@@ -58,37 +58,58 @@ public class Breakout extends Application {
                 if (gameStop) {
                     return;
                 }
-                // 화면 초기화
+
+                //화면 초기화
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-                // Ball 업데이트 및 그리기
-                ball.update();
-                ball.checkCollision(canvas.getWidth(), canvas.getHeight());
-
-                // Paddle 움직임 처리
+                // 입력에 따른 패들 속도 설정
                 if (moveLeft) {
                     paddle.moveLeft();
-                }
-                if (moveRight) {
+                } else if (moveRight) {
                     paddle.moveRight();
+                } else {
+                    paddle.setDx(0);
                 }
 
-                // Paddle 경계 확인 및 그리기
+                //먼저 모든 이동 가능한 객체 이동
+                for (Shape shape : shapes) {
+                    if (shape instanceof Movable movable) {
+                        movable.move();
+                    }
+                }
+
+                //화면 경계 충돌 체크
+                ball.checkCollision(canvas.getWidth(), canvas.getHeight());
                 paddle.checkBounds(canvas.getWidth());
 
-                if (paddle.checkCollision(ball)) {
-                    ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
+                //충돌 체크 및 처리
+                List<Brick> bricksToRemove = new ArrayList<>();
+
+                for (Shape shape : shapes) {
+                    if (shape != ball && ball.isCollisionDetected(shape)) {
+                        // 충돌 시 공을 이전 위치로
+                        ball.revertPosition();
+
+                        // 충돌 객체에 따른 처리
+                        if (shape instanceof Brick brick) {
+                            ball.setDy(-ball.getDy()); // 방향 전환
+                            bricksToRemove.add(brick); // 제거할 벽돌 목록에 추가
+                        } else if (shape instanceof Paddle) {
+                            ball.setDy(-ball.getDy()); // 방향 전환
+                        }
+
+                        break;
+                    }
                 }
 
+                //충돌한 벽돌 제거
+                shapes.removeAll(bricksToRemove);
+
+                //마지막으로 모든 객체 그리기
                 for (Shape shape : shapes) {
                     if (shape instanceof Drawable drawable) {
                         drawable.draw(gc);
-                    }
-                    if (shape instanceof Brick brick) {
-                        if(brick.checkCollision(ball)){
-                            ball.setDy(-ball.getDy());
-                        }
                     }
                 }
             }
