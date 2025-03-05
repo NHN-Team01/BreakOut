@@ -26,19 +26,6 @@ public class Ball extends Circle implements Drawable, Movable{
         gc.fillOval(x - radius, y - radius, radius * 2, radius * 2); // 중심을 기준으로 원 그리기
     }
 
-    // 공이 화면 경계와 충돌했는지 확인 및 속도 반전
-    public void checkCollision(double canvasWidth, double canvasHeight) {
-        // 좌우 경계 충돌
-        if (x - radius <= 0 || x + radius >= canvasWidth) {
-            dx = -dx; // x축 속도 반전
-        }
-        // 상하 경계 충돌
-        if (y - radius <= 0 || y + radius >= canvasHeight) {
-            dy = -dy; // y축 속도 반전
-        }
-
-    }
-
     public boolean isCornerCollision(Shape other) {
         double[][] corners = {
                 {other.getMinX(), other.getMinY()},
@@ -72,7 +59,6 @@ public class Ball extends Circle implements Drawable, Movable{
         }
 
         revertPosition();
-
     }
 
     @Override

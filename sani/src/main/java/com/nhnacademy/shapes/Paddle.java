@@ -35,15 +35,6 @@ public class Paddle extends Rectangle implements Drawable, Movable{
         setDx(speed);
     }
 
-    // 패들이 화면 경계를 벗어나지 않도록 제한
-    public void checkBounds(double canvasWidth) {
-        if (x - width / 2 < 0) { // 왼쪽 경계
-            x = width / 2;
-        } else if (x + width / 2 > canvasWidth) { // 오른쪽 경계
-            x = canvasWidth - width / 2;
-        }
-    }
-
     @Override
     public void move() {
         if(!paused) {
@@ -89,9 +80,23 @@ public class Paddle extends Rectangle implements Drawable, Movable{
 
     @Override
     public boolean isCollisionDetected(Shape other) {
-        return other.getMinX() < getMaxX() &&
+        boolean isCollision = other.getMinX() < getMaxX() &&
                 other.getMaxX() > getMinX() &&
                 other.getMinY() < getMaxY() &&
                 other.getMaxY() > getMinY();
+
+        if (isCollision) {
+            if (other instanceof Wall) {
+                if (getDx() > 0) {
+                    x = other.getMinX() - width / 2;
+                } else if (getDx() < 0) {
+                    x = other.getMaxX() + width / 2;
+                }
+
+                setDx(0);
+            }
+            return true;
+        }
+        return false;
     }
 }

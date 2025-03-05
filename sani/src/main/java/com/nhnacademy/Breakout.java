@@ -22,12 +22,26 @@ public class Breakout extends Application {
     private AnimationTimer gameLoop;
     private boolean gameStop = false;
     private List<Shape> shapes = new ArrayList<>();
+    int score = 0;
 
     @Override
     public void start(Stage primaryStage) {
         // Canvas 생성
         Canvas canvas = new Canvas(800, 600);
         GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        Label scoreLabel = new Label("Score: "+score);
+        scoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
+
+        // VBox에 점수 표시 추가
+        VBox uiOverlay = new VBox();
+        uiOverlay.getChildren().add(scoreLabel);
+        uiOverlay.setStyle("-fx-alignment: top-center; -fx-padding: 10;");
+
+        // StackPane에 Canvas와 UI 레이어 추가
+        StackPane root = new StackPane();
+        root.getChildren().addAll(canvas, uiOverlay);
+
 
         // Ball 생성
         Ball ball = new Ball(400, 300, 10, 3.5, 3.5, Color.RED);
@@ -52,6 +66,11 @@ public class Breakout extends Application {
                 shapes.add(new Brick(x, y, brickWidth, brickHeight, Color.BLUE));
             }
         }
+
+        shapes.add(new Wall(0, 300, 10, 600)); // 왼쪽 벽
+        shapes.add(new Wall(800, 300, 10, 600)); // 오른쪽 벽
+        shapes.add(new Wall(400, 0, 800, 10)); // 상단 벽
+        shapes.add(new Wall(400, 600, 800, 10)); // 하단 벽
 
         // 게임 루프
         gameLoop = new AnimationTimer() {
@@ -81,17 +100,17 @@ public class Breakout extends Application {
                     }
                 }
 
-                //화면 경계 충돌 체크
-                ball.checkCollision(canvas.getWidth(), canvas.getHeight());
-                paddle.checkBounds(canvas.getWidth());
-
                 //충돌 체크 및 처리
                 List<Brick> bricksToRemove = new ArrayList<>();
 
                 for (Shape shape : shapes) {
+                    if (shape instanceof Wall wall) {
+                        paddle.isCollisionDetected(wall);
+                    }
                     if (shape != ball && ball.isCollisionDetected(shape)) {
                         if (shape instanceof Brick brick) {
-                            ball.setDy(-ball.getDy()); // 방향 전환
+                            score += 10;
+                            scoreLabel.setText("Score: " + score);
                             bricksToRemove.add(brick); // 제거할 벽돌 목록에 추가
                         }
                         break;
@@ -110,10 +129,6 @@ public class Breakout extends Application {
             }
         };
         gameLoop.start();
-
-        // 레이아웃 설정
-        StackPane root = new StackPane();
-        root.getChildren().add(canvas);
 
         // 키보드 입력 처리
         Scene scene = new Scene(root, 800, 600);
