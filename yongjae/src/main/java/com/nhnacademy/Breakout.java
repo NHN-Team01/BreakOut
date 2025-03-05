@@ -155,11 +155,9 @@ public class Breakout extends Application {
                 for (int i = 0; i < bricks.size(); i++) {
                     for (int j = 0; j < bricks.get(i).size(); j++) {
                         Brick brick = bricks.get(i).get(j);
+                        if (brick == null) continue;
                         if (ball.isCollisionDetected(brick)) {
                             brick.crash();
-                            if (brick.isDestroyed) {
-                                updateScore(brick);
-                            }
                             ball.bounce(brick);
                             if (brick instanceof BombBrick) {
                                 boomEffect(i, j, rows, cols, bricks);
@@ -167,12 +165,18 @@ public class Breakout extends Application {
                             else if (brick instanceof PaddleLengthBrick) {
                                 widePaddleEffect(paddle);
                             }
+                            if (brick.isDestroyed) {
+                                updateScore(brick);
+                                brick = null;
+                            }
                         }
-                        if (!brick.isDestroyed()) {
+                        if (brick != null) {
                             brickCount++;
                         }
                     }
                 }
+                shapes.removeIf(shape -> shape instanceof Brick && ((Brick) shape).isDestroyed);
+                System.out.println(shapes.size());
                 for (Shape shape : shapes) {
                     if (shape instanceof Drawable) {
                         Drawable drawable = (Drawable) shape;
