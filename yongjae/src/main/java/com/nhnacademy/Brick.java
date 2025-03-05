@@ -33,7 +33,6 @@ public class Brick extends Rectangle implements Drawable {
     }
 
     // 공과 충돌 여부 확인
-    @Override
     public boolean checkCollision(Ball ball) {
         if (isDestroyed) {
             return false; // 이미 파괴된 벽돌은 충돌하지 않음

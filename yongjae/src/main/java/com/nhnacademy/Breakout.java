@@ -105,7 +105,7 @@ public class Breakout extends Application {
                 gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
                 // Ball 업데이트 및 그리기
-                ball.update();
+                ball.move();
                 ball.checkCollision(canvas.getWidth(), canvas.getHeight());
 
                 // 패배 조건
@@ -116,16 +116,18 @@ public class Breakout extends Application {
 
                 // Paddle 움직임 처리
                 if (moveLeft) {
-                    paddle.moveLeft();
+                    paddle.setDx(-5);
+                    paddle.move();
                 }
                 if (moveRight) {
-                    paddle.moveRight();
+                    paddle.setDx(5);
+                    paddle.move();
                 }
 
                 // Paddle 경계 확인 및 그리기
                 paddle.checkBounds(canvas.getWidth());
 
-                if (paddle.checkCollision(ball)) {
+                if (paddle.isCollisionDetected(ball)) {
                     ball.setDy(-Math.abs(ball.getDy())); // 충돌 시 공의 y 방향 반전
                 }
 

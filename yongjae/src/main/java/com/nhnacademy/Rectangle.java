@@ -18,9 +18,6 @@ public abstract class Rectangle extends Shape {
         this.height = height;
     }
 
-    // 공과 충돌 여부 확인
-    public abstract boolean checkCollision(Ball ball) ;
-
     // Getter와 Setter (필요 시 사용)
     public double getX() {
         return x;
