@@ -80,9 +80,13 @@ public class Breakout extends Application {
                         }
                         brick.draw(gc);
                     }
+                    // Movable 객체 이동 처리
+                    if(shape instanceof Movable) {
+                        Movable movable = (Movable)shape;
+                        movable.move();
+                    }
                 }
 
-                ball.update();
                 ball.checkCollision(canvas.getWidth(), canvas.getHeight());
 
                 // 화면의 하단에 닿으면 게임 오버
@@ -97,6 +101,9 @@ public class Breakout extends Application {
                 }
                 if (moveRight) {
                     paddle.moveRight();
+                } 
+                if (moveLeft == moveRight) { // 방향키가 동시에 눌러져 있거나 둘다 눌러져있지 않을 때 패들 속도 0으로 설정
+                    paddle.setDx(0);
                 }
 
                 // Paddle 경계 확인 및 그리기
@@ -105,7 +112,7 @@ public class Breakout extends Application {
                 if (paddle.checkCollision(ball)) {
                     ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
                 }
-                
+
             }
         };
         gameLoop.start();

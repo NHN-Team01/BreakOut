@@ -3,8 +3,11 @@ package com.nhnacademy;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Paddle extends Rectangle {
-    private double speed; // 패들의 이동 속도
+public class Paddle extends Rectangle implements Movable {
+    private double speed;   // 패들 속도
+    private double dx = 0;      // X 방향 이동속도
+    private final double dy = 0;  // Y 방향 이동속도 (패들은 Y 방향으로는 이동하지 않으므로 0)
+    private boolean isPaused = false;
 
     // 생성자
     public Paddle(double x, double y, double width, double height, double speed, Color color) {
@@ -15,17 +18,17 @@ public class Paddle extends Rectangle {
     // 패들을 그리는 메서드
     public void draw(GraphicsContext gc) {
         gc.setFill(color);
-        gc.fillRect(x - width / 2, y - height / 2, width, height); // 중심을 기준으로 사각형 그리기
+        gc.fillRect(getMinX(), getMinY(), width, height); // 중심을 기준으로 사각형 그리기
     }
 
     // 패들의 위치를 왼쪽으로 이동
     public void moveLeft() {
-        x -= speed;
+        dx = -speed;
     }
 
     // 패들의 위치를 오른쪽으로 이동
     public void moveRight() {
-        x += speed;
+        dx = speed;
     }
 
     public boolean checkCollision(Ball ball) {
@@ -45,20 +48,40 @@ public class Paddle extends Rectangle {
         }
     }
 
-    // Getter와 Setter (필요 시 사용)
-    public double getX() {
-        return x;
+    @Override
+    public void move() {
+        if(!isPaused) {
+            x += dx;
+        }
     }
 
-    public double getY() {
-        return y;
+    @Override
+    public double getDx() {
+        return dx;
     }
 
-    public double getWidth() {
-        return width;
+    @Override
+    public double getDy() {
+        return dy;
     }
 
-    public double getHeight() {
-        return height;
+    @Override
+    public void setDx(double dx) {
+        this.dx = dx;
+    }
+
+    @Override
+    public void setDy(double dy) {
+        
+    }
+
+    @Override
+    public void pause() {
+        isPaused = true;
+    }
+
+    @Override
+    public void resume() {
+        isPaused = false;
     }
 }
