@@ -4,27 +4,18 @@ import com.nhnacademy.manager.ViewManager;
 import com.nhnacademy.shapes.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class Breakout extends Application {
     private boolean moveLeft;
     private boolean moveRight;
     private AnimationTimer gameLoop;
-    private boolean gameStop;
     private List<Shape> shapes = new ArrayList<>();
     int score;
     private Paddle paddle;
@@ -36,9 +27,8 @@ public class Breakout extends Application {
         score = 0;
         moveLeft = false;
         moveRight = false;
-        gameStop = false;
 
-        ball = new Ball(400, 300, 10, 3.5, 3.5, Color.RED);
+        ball = new Ball(400, 300, 10, 3, 3, Color.RED);
         shapes.add(ball);
 
         paddle = new Paddle(400, 550, 100, 20, 5, Color.BLUE);
@@ -77,7 +67,7 @@ public class Breakout extends Application {
         gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (gameStop) {
+                if (viewManager.isGameStop()) {
                     return;
                 }
 
@@ -110,17 +100,15 @@ public class Breakout extends Application {
                             bricksToRemove.add(brick); // 제거할 벽돌 목록에 추가
                         }
                         if (shape instanceof Blockable) {
-                            showGameOverPopup();
+                            viewManager.showGameOverPopup(score, Breakout.this::initializeGame);
                             return;
                         }
                         break;
                     }
                 }
 
-                //충돌한 벽돌 제거
                 shapes.removeAll(bricksToRemove);
 
-                //마지막으로 모든 객체 그리기
                 viewManager.render(shapes, score);
             }
         };
@@ -146,54 +134,6 @@ public class Breakout extends Application {
         primaryStage.setTitle("Brick Breaker");
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
-
-    private void showGameOverPopup() {
-        gameStop = true;
-        gameLoop.stop();
-
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.NONE);
-            alert.setTitle("Game Over");
-            alert.setHeaderText(null);
-
-            // 사용자 정의 메시지 및 스타일
-            VBox content = new VBox(10);
-            content.setAlignment(Pos.CENTER);
-
-            Label gameOverLabel = new Label("Game Over!");
-            gameOverLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-
-            Label scoreLabel = new Label("최종 점수: " + score);
-            scoreLabel.setStyle("-fx-font-size: 18px;");
-
-            // 버튼 생성
-            ButtonType restartButton = new ButtonType("다시 시작", ButtonBar.ButtonData.OK_DONE);
-            ButtonType exitButton = new ButtonType("종료", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-            alert.getButtonTypes().setAll(restartButton, exitButton);
-
-            content.getChildren().addAll(gameOverLabel, scoreLabel);
-            alert.getDialogPane().setContent(content);
-
-            // 버튼 응답 처리
-            Optional<ButtonType> result = alert.showAndWait();
-
-            if (result.isPresent()) {
-                if (result.get() == restartButton) {
-                    restartGame();
-                } else if (result.get() == exitButton) {
-                    Platform.exit();
-                }
-            }
-        });
-    }
-
-    private void restartGame() {
-        gameStop = false;
-        initializeGame();
-
-        gameLoop.start();
     }
 
     public static void main(String[] args) {
