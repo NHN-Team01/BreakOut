@@ -6,8 +6,10 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -28,7 +30,7 @@ public class Breakout extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         // Ball 생성
-        Ball ball = new Ball(400, 300, 10, 3, 3, Color.RED);
+        Ball ball = new Ball(400, 300, 10, 3.5, 3.5, Color.RED);
         shapes.add(ball);
         // Paddle 생성
         Paddle paddle = new Paddle(400, 550, 100, 20, 5, Color.BLUE);
@@ -36,8 +38,8 @@ public class Breakout extends Application {
 
         // 벽돌 생성
         int rows = 5;
-        int cols = 10;
-        double brickWidth = 70;
+        int cols = 8;
+        double brickWidth = 95;
         double brickHeight = 20;
         double padding = 5;
         double startX = 50;
@@ -88,17 +90,10 @@ public class Breakout extends Application {
 
                 for (Shape shape : shapes) {
                     if (shape != ball && ball.isCollisionDetected(shape)) {
-                        // 충돌 시 공을 이전 위치로
-                        ball.revertPosition();
-
-                        // 충돌 객체에 따른 처리
                         if (shape instanceof Brick brick) {
                             ball.setDy(-ball.getDy()); // 방향 전환
                             bricksToRemove.add(brick); // 제거할 벽돌 목록에 추가
-                        } else if (shape instanceof Paddle) {
-                            ball.setDy(-ball.getDy()); // 방향 전환
                         }
-
                         break;
                     }
                 }

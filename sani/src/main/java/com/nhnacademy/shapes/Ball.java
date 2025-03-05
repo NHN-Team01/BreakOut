@@ -36,11 +36,47 @@ public class Ball extends Circle implements Drawable, Movable{
         if (y - radius <= 0 || y + radius >= canvasHeight) {
             dy = -dy; // y축 속도 반전
         }
+
+    }
+
+    public boolean isCornerCollision(Shape other) {
+        double[][] corners = {
+                {other.getMinX(), other.getMinY()},
+                {other.getMinX(), other.getMaxY()},
+                {other.getMaxX(),other.getMaxY()},
+                {other.getMaxX(),other.getMinY()}
+        };
+
+        for(double[] corner: corners) {
+            double distanceToCorner = Math.sqrt(Math.pow(x - corner[0], 2) + Math.pow(y - corner[1], 2));
+            if (distanceToCorner<=radius) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void bounce(Shape other, double x, double y) {
+
+        if (x > other.getMinX() && x < other.getMaxX() && (y == other.getMaxY() || y == other.getMinY())) {
+            dy = -dy;
+            color = Color.RED;
+        } else if (y > other.getMinY() && y < other.getMaxY() && (x == other.getMaxX() || x == other.getMinX())) {
+            dx = -dx;
+            color = Color.GREEN;
+        } else if (isCornerCollision(other)) {
+            dx = -dx;
+            dy = -dy;
+            color = Color.YELLOW;
+        }
+
+        revertPosition();
+
     }
 
     @Override
     public boolean isCollisionDetected(Shape other) {
-        // 원과 사각형의 충돌 감지
         // 원의 중심에서 가장 가까운 사각형 위의 점 찾기
         double closestX = Math.max(other.getMinX(), Math.min(x, other.getMaxX()));
         double closestY = Math.max(other.getMinY(), Math.min(y, other.getMaxY()));
@@ -51,7 +87,12 @@ public class Ball extends Circle implements Drawable, Movable{
         double distanceSquared = distanceX * distanceX + distanceY * distanceY;
 
         // 거리가 반지름보다 작거나 같으면 충돌
-        return distanceSquared <= (radius * radius);
+        boolean isCollision = distanceSquared <= (radius * radius);
+
+        if (isCollision) {
+            bounce(other, closestX, closestY);
+        }
+        return isCollision;
     }
 
     public double getDx() {
@@ -76,8 +117,8 @@ public class Ball extends Circle implements Drawable, Movable{
     @Override
     public void move() {
         if (!paused) {
-            prevX = x;
-            prevY = y;
+            prevX = x - dx;
+            prevY = y - dy;
             x += dx;
             y += dy;
         }
