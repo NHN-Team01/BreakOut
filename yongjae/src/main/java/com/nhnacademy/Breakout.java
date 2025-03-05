@@ -8,8 +8,11 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -24,6 +27,8 @@ public class Breakout extends Application {
     private boolean gameStop = false;
     private int[] dy = {-1 , 0 , 1};
     private int[] dx = {-1 , 0 , 1};
+    int score = 0;
+    Label scoreLabel = new Label();
 
     @Override
     public void start(Stage primaryStage) {
@@ -108,6 +113,9 @@ public class Breakout extends Application {
                     for (int j = 0; j < bricks.get(i).size(); j++) {
                         Brick brick = bricks.get(i).get(j);
                         if (brick.checkCollision(ball)) {
+                            if (brick.isDestroyed) {
+                                updateScore(brick);
+                            }
                             ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
                             if (brick instanceof BombBrick) {
                                 boomEffect(i, j, rows, cols, bricks);
@@ -130,9 +138,14 @@ public class Breakout extends Application {
         };
         gameLoop.start();
 
-        // 레이아웃 설정
-        StackPane root = new StackPane();
-        root.getChildren().add(canvas);
+        scoreLabel.setText("Score: " + score);
+        scoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: red;");
+
+
+        // BorderPane에 요소 배치
+        BorderPane root = new BorderPane();
+        root.setTop(scoreLabel);  // 상단에 점수
+        root.setCenter(canvas);  // 중앙에 Canvas
 
         // 키보드 입력 처리
         Scene scene = new Scene(root, 800, 600);
@@ -156,6 +169,14 @@ public class Breakout extends Application {
         primaryStage.setTitle("Brick Breaker");
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        scoreLabel.setFocusTraversable(false);
+        canvas.setFocusTraversable(false);
+    }
+
+    private void updateScore(Brick brick) {
+        score += brick.getScore();
+        scoreLabel.setText("Score: " + score);
     }
 
     private static void widePaddleEffect(Paddle paddle) {
@@ -170,6 +191,7 @@ public class Breakout extends Application {
                 if (0 <= ni && 0<= nj && ni < rows && nj < cols) {
                     Brick b = bricks.get(ni).get(nj);
                     b.setDestroyed(true);
+                    updateScore(b);
                 }
             }
         }
