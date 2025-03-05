@@ -68,6 +68,12 @@ public class Breakout extends Application {
                 ball.update();
                 ball.checkCollision(canvas.getWidth(), canvas.getHeight());
                 ball.draw(gc);
+                
+                // 화면의 하단에 닿으면 게임 오버
+                if(ball.isAtBottom(canvas.getHeight())) {
+                    gameStop = true;
+                    showGameOverPopup();
+                }
 
                 // Paddle 움직임 처리
                 if (moveLeft) {
@@ -122,6 +128,22 @@ public class Breakout extends Application {
         primaryStage.setTitle("Brick Breaker");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    // 팝업을 표시하고 종료하는 메서드
+    private void showGameOverPopup() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(AlertType.INFORMATION, "Game Over! Thank you for playing.", ButtonType.OK);
+            alert.setTitle("Game Over");
+            alert.setHeaderText(null);
+
+            // 팝업 닫기 후 게임 종료
+            alert.showAndWait().ifPresent(response -> {
+                if(response == ButtonType.OK) {
+                    Platform.exit(); // 게임 종료
+                }
+            });
+        });
     }
 
     public static void main(String[] args) {

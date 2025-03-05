@@ -22,13 +22,23 @@ public class Ball extends Circle {
     // 공이 화면 경계와 충돌했는지 확인 및 속도 반전
     public void checkCollision(double canvasWidth, double canvasHeight) {
         // 좌우 경계 충돌
-        if (x - radius <= 0 || x + radius >= canvasWidth) {
+        if (getMinX() <= 0 || getMaxX() >= canvasWidth) {
             dx = -dx; // x축 속도 반전
         }
         // 상하 경계 충돌
-        if (y - radius <= 0 || y + radius >= canvasHeight) {
+        if (getMinY() <= 0 || getMaxY() >= canvasHeight) {
             dy = -dy; // y축 속도 반전
         }
+    }
+
+    /**
+     * 공이 화면 하단 경계에 닿았는지 확인하는 메서드
+     * 
+     * @param canvasHeight 화면의 높이
+     * @return 공이 하단 경계에 닿았다면 true, 아니면 false
+     */
+    public boolean isAtBottom(double canvasHeight) {
+        return getMaxY() >= canvasHeight;
     }
 
     public double getDx() {
