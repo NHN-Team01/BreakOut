@@ -76,6 +76,9 @@ public class Ball extends Circle implements Drawable, Movable{
         boolean isCollision = distanceSquared <= (radius * radius);
 
         if (isCollision) {
+            if (other instanceof Blockable) {
+                return true;
+            }
             bounce(other, closestX, closestY);
         }
         return isCollision;
