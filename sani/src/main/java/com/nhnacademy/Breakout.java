@@ -1,19 +1,17 @@
 package com.nhnacademy;
 
+import com.nhnacademy.manager.ViewManager;
 import com.nhnacademy.shapes.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -31,6 +29,7 @@ public class Breakout extends Application {
     int score;
     private Paddle paddle;
     private Ball ball;
+    private ViewManager viewManager;
 
     private void initializeGame() {
         shapes.clear();
@@ -69,21 +68,8 @@ public class Breakout extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Canvas 생성
-        Canvas canvas = new Canvas(800, 600);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        Label scoreLabel = new Label("Score: "+score);
-        scoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
-
-        // VBox에 점수 표시 추가
-        VBox uiOverlay = new VBox();
-        uiOverlay.getChildren().add(scoreLabel);
-        uiOverlay.setStyle("-fx-alignment: top-center; -fx-padding: 10;");
-
-        // StackPane에 Canvas와 UI 레이어 추가
-        StackPane root = new StackPane();
-        root.getChildren().addAll(canvas, uiOverlay);
+        viewManager = new ViewManager();
+        Scene scene = new Scene(viewManager.getRoot(), 800, 600);
 
         initializeGame();
 
@@ -94,10 +80,6 @@ public class Breakout extends Application {
                 if (gameStop) {
                     return;
                 }
-
-                //화면 초기화
-                gc.setFill(Color.BLACK);
-                gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
                 // 입력에 따른 패들 속도 설정
                 if (moveLeft) {
@@ -125,7 +107,6 @@ public class Breakout extends Application {
                     if (shape != ball && ball.isCollisionDetected(shape)) {
                         if (shape instanceof Brick brick) {
                             score += 10;
-                            scoreLabel.setText("Score: " + score);
                             bricksToRemove.add(brick); // 제거할 벽돌 목록에 추가
                         }
                         if (shape instanceof Blockable) {
@@ -140,18 +121,12 @@ public class Breakout extends Application {
                 shapes.removeAll(bricksToRemove);
 
                 //마지막으로 모든 객체 그리기
-                for (Shape shape : shapes) {
-                    if (shape instanceof Drawable drawable) {
-                        drawable.draw(gc);
-                    }
-                }
+                viewManager.render(shapes, score);
             }
         };
         gameLoop.start();
 
         // 키보드 입력 처리
-        Scene scene = new Scene(root, 800, 600);
-
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.LEFT) {
                 moveLeft = true;
@@ -206,10 +181,8 @@ public class Breakout extends Application {
 
             if (result.isPresent()) {
                 if (result.get() == restartButton) {
-                    // 게임 재시작 로직
                     restartGame();
                 } else if (result.get() == exitButton) {
-                    // 게임 완전 종료
                     Platform.exit();
                 }
             }
