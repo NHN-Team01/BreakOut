@@ -4,17 +4,16 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Brick extends Rectangle {
-    private Color color; // 벽돌의 색상
     private boolean isDestroyed; // 벽돌이 파괴되었는지 여부
 
     // 생성자
     public Brick(double x, double y, double width, double height, Color color) {
-        super(x, y, width, height);
-        this.color = color;
+        super(x, y, width, height, color);
         this.isDestroyed = false; // 초기 상태는 파괴되지 않음
     }
 
     // 벽돌을 그리는 메서드
+    @Override
     public void draw(GraphicsContext gc) {
         if (!isDestroyed) {
             gc.setFill(color);
