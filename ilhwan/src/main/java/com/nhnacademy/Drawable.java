@@ -1,5 +1,7 @@
 package com.nhnacademy;
 
+import javafx.scene.canvas.GraphicsContext;
+
 public interface Drawable {
-    void draw();
+    void draw(GraphicsContext gc);
 }
