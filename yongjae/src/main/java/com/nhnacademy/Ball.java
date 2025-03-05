@@ -3,7 +3,7 @@ package com.nhnacademy;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Ball extends Circle implements Drawable, Movable {
+public class Ball extends Circle implements Drawable, Movable, Bounceable {
     private double dx; // 공의 x축 속도 (단위: 픽셀/프레임)
     private double dy; // 공의 y축 속도 (단위: 픽셀/프레임)
     private boolean paused;
@@ -26,18 +26,6 @@ public class Ball extends Circle implements Drawable, Movable {
         if (!paused) {
             x += dx; // x축 위치 업데이트
             y += dy; // y축 위치 업데이트
-        }
-    }
-
-    // 공이 화면 경계와 충돌했는지 확인 및 속도 반전
-    public void checkCollision(double canvasWidth, double canvasHeight) {
-        // 좌우 경계 충돌
-        if (x - radius <= 0 || x + radius >= canvasWidth) {
-            dx = -dx; // x축 속도 반전
-        }
-        // 상하 경계 충돌
-        if (y - radius <= 0) {
-            dy = -dy; // y축 속도 반전
         }
     }
 
@@ -102,5 +90,47 @@ public class Ball extends Circle implements Drawable, Movable {
                     ballY - ballRadius < paddle.y + paddle.height;
         }
         return false;
+    }
+
+    @Override
+    public void bounce(Shape shape) {
+        if (shape instanceof Wall) {
+            Wall wall = (Wall) shape;
+            if (wall.width == 0) {
+                dx = -dx;
+            }
+            else if (wall.height == 0) {
+                dy = -dy;
+            }
+        }
+        else if (shape instanceof Rectangle) {
+            Rectangle rectangle = (Rectangle) shape;
+            if(rectangle.x > x && rectangle.y > y && radius * radius > Math.sqrt(x - rectangle.x) + Math.sqrt(y - rectangle.y)) {
+                dx = -dx;
+                dy = -dy;
+            }
+            else if (rectangle.x > x && rectangle.y + rectangle.getHeight() < y && radius * radius > Math.sqrt(x - rectangle.x) + Math.sqrt(y - (rectangle.y + rectangle.getHeight()))) {
+                dx = -dx;
+                dy = -dy;
+            }
+            else if (rectangle.x + rectangle.getWidth() < x && rectangle.y > y && radius * radius > Math.sqrt(x - (rectangle.x + rectangle.getWidth())) + Math.sqrt(y - rectangle.y)) {
+                dx = -dx;
+                dy = -dy;
+            }
+            else if (rectangle.x + rectangle.getWidth() < x && rectangle.y + rectangle.getHeight() < y && radius * radius > Math.sqrt(x - (rectangle.x + rectangle.getWidth())) + Math.sqrt(y - (rectangle.y + rectangle.getHeight()))) {
+                dx = -dx;
+                dy = -dy;
+            }
+            else if (rectangle.x < x && x < rectangle.x + rectangle.getWidth()) {
+                if (y + radius > rectangle.y &&  y - radius < rectangle.y + rectangle.getHeight()) {
+                    dy = -dy;
+                }
+            }
+            else if (rectangle.y < y && y < rectangle.y + rectangle.getHeight()) {
+                if (x + radius > rectangle.x &&  x - radius < rectangle.x + rectangle.getWidth()) {
+                    dx = -dx;
+                }
+            }
+        }
     }
 }

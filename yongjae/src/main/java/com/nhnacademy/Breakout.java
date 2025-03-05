@@ -56,6 +56,17 @@ public class Breakout extends Application {
         Paddle paddle = new Paddle(400, 550, 100, 20, 5, Color.BLUE);
         shapes.add(paddle);
 
+        // Wall 생성
+        Wall[] walls = new Wall[4];
+        walls[0] = new Wall(0, 0 , 800, 0);
+        walls[1] = new Wall(0, 0 , 0, 600);
+        walls[2] = new Wall(800, 0 , 0, 600);
+        walls[3] = new Wall(0, 600 , 800, 0);
+        shapes.add(walls[0]);
+        shapes.add(walls[1]);
+        shapes.add(walls[2]);
+        shapes.add(walls[3]);
+
         // 벽돌 생성
         List<List<Brick>> bricks = new ArrayList<>();
         int rows = 5;
@@ -106,10 +117,14 @@ public class Breakout extends Application {
 
                 // Ball 업데이트 및 그리기
                 ball.move();
-                ball.checkCollision(canvas.getWidth(), canvas.getHeight());
+                for(int i = 0; i < 3; i++) {
+                    if (ball.isCollisionDetected(walls[i])){
+                        ball.bounce(walls[i]);
+                    }
+                }
 
-                // 패배 조건
-                if (ball.getY() + ball.getRadius() >= canvas.getHeight()) {
+                // 아랫벽과 부딪치는 패배 조건
+                if (ball.isCollisionDetected(walls[3])) {
                     gameStop = true;
                     showGameOverPopup(primaryStage); // 팝업 출력
                 }
@@ -139,7 +154,7 @@ public class Breakout extends Application {
                             if (brick.isDestroyed) {
                                 updateScore(brick);
                             }
-                            ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
+                            ball.bounce(brick);
                             if (brick instanceof BombBrick) {
                                 boomEffect(i, j, rows, cols, bricks);
                             }
