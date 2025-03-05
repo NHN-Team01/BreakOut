@@ -22,6 +22,7 @@ public class Breakout extends Application {
     private boolean moveRight = false;
     private AnimationTimer gameLoop;
     private boolean gameStop = false;
+    private List<Shape> shapes = new ArrayList<>();
 
     @Override
     public void start(Stage primaryStage) {
@@ -31,12 +32,13 @@ public class Breakout extends Application {
 
         // Ball 생성
         Ball ball = new Ball(400, 300, 10, 3, 3, Color.RED);
+        shapes.add(ball);
 
         // Paddle 생성
         Paddle paddle = new Paddle(400, 550, 100, 20, 5, Color.BLUE);
+        shapes.add(paddle);
 
         // 벽돌 생성
-        List<Brick> bricks = new ArrayList<>();
         int rows = 5;
         int cols = 10;
         double brickWidth = 70;
@@ -49,7 +51,7 @@ public class Breakout extends Application {
             for (int col = 0; col < cols; col++) {
                 double x = startX + col * (brickWidth + padding);
                 double y = startY + row * (brickHeight + padding);
-                bricks.add(new Brick(x, y, brickWidth, brickHeight, Color.BLUE));
+                shapes.add(new Brick(x, y, brickWidth, brickHeight, Color.BLUE));
             }
         }
 
@@ -64,10 +66,34 @@ public class Breakout extends Application {
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-                // Ball 업데이트 및 그리기
-                ball.update();
+                // 도형 객체 일괄 관리
+                for(Shape shape : shapes) {
+                    if(shape instanceof Drawable) {
+                        Drawable drawable = (Drawable)shape;
+                        drawable.draw(gc);
+                    }
+                    // 벽돌 그리기 및 충돌 처리
+                    if(shape instanceof Brick) {
+                        Brick brick = (Brick)shape;
+                        if(brick.isCollisionDetected(ball)) {
+                            ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
+                        }
+                        brick.draw(gc);
+                    }
+                    // Movable 객체 이동 처리
+                    if(shape instanceof Movable) {
+                        Movable movable = (Movable)shape;
+                        movable.move();
+                    }
+                }
+
                 ball.checkCollision(canvas.getWidth(), canvas.getHeight());
-                ball.draw(gc);
+
+                // 화면의 하단에 닿으면 게임 오버
+                if(ball.isAtBottom(canvas.getHeight())) {
+                    gameStop = true;
+                    showGameOverPopup();
+                }
 
                 // Paddle 움직임 처리
                 if (moveLeft) {
@@ -75,23 +101,18 @@ public class Breakout extends Application {
                 }
                 if (moveRight) {
                     paddle.moveRight();
+                } 
+                if (moveLeft == moveRight) { // 방향키가 동시에 눌러져 있거나 둘다 눌러져있지 않을 때 패들 속도 0으로 설정
+                    paddle.setDx(0);
                 }
 
                 // Paddle 경계 확인 및 그리기
                 paddle.checkBounds(canvas.getWidth());
-                paddle.draw(gc);
 
-                if (paddle.checkCollision(ball)) {
+                if (paddle.isCollisionDetected(ball)) {
                     ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
                 }
 
-                // 벽돌 그리기 및 충돌 처리
-                for (Brick brick : bricks) {
-                    if (brick.checkCollision(ball)) {
-                        ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
-                    }
-                    brick.draw(gc);
-                }
             }
         };
         gameLoop.start();
@@ -122,6 +143,22 @@ public class Breakout extends Application {
         primaryStage.setTitle("Brick Breaker");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    // 팝업을 표시하고 종료하는 메서드
+    private void showGameOverPopup() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(AlertType.INFORMATION, "Game Over! Thank you for playing.", ButtonType.OK);
+            alert.setTitle("Game Over");
+            alert.setHeaderText(null);
+
+            // 팝업 닫기 후 게임 종료
+            alert.showAndWait().ifPresent(response -> {
+                if(response == ButtonType.OK) {
+                    Platform.exit(); // 게임 종료
+                }
+            });
+        });
     }
 
     public static void main(String[] args) {
