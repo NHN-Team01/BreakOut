@@ -57,15 +57,15 @@ public class Breakout extends Application {
         shapes.add(paddle);
 
         // Wall 생성
-        Wall[] walls = new Wall[4];
+        Wall[] walls = new Wall[3];
         walls[0] = new Wall(0, 0 , 800, 0);
         walls[1] = new Wall(0, 0 , 0, 600);
         walls[2] = new Wall(800, 0 , 0, 600);
-        walls[3] = new Wall(0, 600 , 800, 0);
+        Block block = new Block(0, 600 , 800, 0);
         shapes.add(walls[0]);
         shapes.add(walls[1]);
         shapes.add(walls[2]);
-        shapes.add(walls[3]);
+        shapes.add(block);
 
         // 벽돌 생성
         List<List<Brick>> bricks = new ArrayList<>();
@@ -124,7 +124,7 @@ public class Breakout extends Application {
                 }
 
                 // 아랫벽과 부딪치는 패배 조건
-                if (ball.isCollisionDetected(walls[3])) {
+                if (ball.isCollisionDetected(block)) {
                     gameStop = true;
                     showGameOverPopup(primaryStage); // 팝업 출력
                 }
