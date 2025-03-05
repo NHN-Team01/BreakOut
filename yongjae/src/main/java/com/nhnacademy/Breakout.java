@@ -176,7 +176,6 @@ public class Breakout extends Application {
                     }
                 }
                 shapes.removeIf(shape -> shape instanceof Brick && ((Brick) shape).isDestroyed);
-                System.out.println(shapes.size());
                 for (Shape shape : shapes) {
                     if (shape instanceof Drawable) {
                         Drawable drawable = (Drawable) shape;
