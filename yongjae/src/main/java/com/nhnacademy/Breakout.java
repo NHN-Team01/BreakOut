@@ -90,6 +90,10 @@ public class Breakout extends Application {
                     temp = new PaddleLengthBrick(x, y, brickWidth, brickHeight);
                     bricks.get(row).add(temp);
                 }
+                else if (row == 4 && col == 0) {
+                    temp = new SpeedUpBrick(x, y, brickWidth, brickHeight);
+                    bricks.get(row).add(temp);
+                }
                 else {
                     temp = new Brick(x, y, brickWidth, brickHeight, (int) (Math.random()*5) + 1);
                     bricks.get(row).add(temp);
