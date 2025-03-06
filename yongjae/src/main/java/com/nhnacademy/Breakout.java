@@ -168,6 +168,7 @@ public class Breakout extends Application {
                             if (brick.isDestroyed) {
                                 updateScore(brick);
                                 brick = null;
+                                bricks.get(i).set(j, null);
                             }
                         }
                         if (brick != null) {
@@ -208,6 +209,16 @@ public class Breakout extends Application {
             } else if (event.getCode() == KeyCode.RIGHT) {
                 moveRight = true;
             }
+            else if (event.getCode() == KeyCode.SPACE) {
+                if (ball.isPaused()) {
+                    ball.resume();
+                    paddle.resume();
+                }
+                else {
+                    ball.pause();
+                    paddle.pause();
+                }
+            }
         });
 
         scene.setOnKeyReleased(event -> {
@@ -242,8 +253,10 @@ public class Breakout extends Application {
                 int nj = j + dy[l];
                 if (0 <= ni && 0<= nj && ni < rows && nj < cols) {
                     Brick b = bricks.get(ni).get(nj);
+                    if (b == null) continue;
                     b.setDestroyed(true);
                     updateScore(b);
+                    bricks.get(ni).set(nj, null);
                 }
             }
         }

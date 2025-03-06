@@ -45,6 +45,8 @@ public class Ball extends Circle implements Drawable, Movable, Bounceable {
         this.dy = dy;
     }
 
+    public boolean isPaused() { return paused; }
+
     @Override
     public void pause() {
         paused = true;
