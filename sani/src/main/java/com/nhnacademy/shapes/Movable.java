@@ -7,15 +7,6 @@ public interface Movable {
 
     void setDx(double dx);
 
-    double getDy();
-
-    void setDy(double dy);
-
-    void pause();
-
-    void resume();
-
     boolean isCollisionDetected(Shape other);
 
-    void revertPosition(); // 추가된 메서드
 }

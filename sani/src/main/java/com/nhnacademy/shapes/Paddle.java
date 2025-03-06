@@ -7,15 +7,12 @@ public class Paddle extends Rectangle implements Drawable, Movable{
     private double speed; // 패들의 이동 속도
     private Color color; // 패들의 색상
     private double dx;
-    private boolean paused;
-    private double prevX;
 
     // 생성자
     public Paddle(double x, double y, double width, double height, double speed, Color color) {
         super(x, y, width, height);
         this.speed = speed;
         this.color = color;
-        this.paused = false;
         this.dx = 0;
     }
 
@@ -37,25 +34,7 @@ public class Paddle extends Rectangle implements Drawable, Movable{
 
     @Override
     public void move() {
-        if(!paused) {
-            prevX = x;
-            x += dx;
-        }
-    }
-
-    @Override
-    public void revertPosition() {
-        x = prevX;
-    }
-
-    @Override
-    public double getDy() {
-        return 0;
-    }
-
-    @Override
-    public void setDy(double dy) {
-
+        x += dx;
     }
 
     @Override
@@ -66,16 +45,6 @@ public class Paddle extends Rectangle implements Drawable, Movable{
     @Override
     public void setDx(double dx) {
         this.dx = dx;
-    }
-
-    @Override
-    public void pause() {
-        paused = true;
-    }
-
-    @Override
-    public void resume() {
-        paused = false;
     }
 
     @Override
