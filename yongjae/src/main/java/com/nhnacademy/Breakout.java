@@ -23,8 +23,7 @@ public class Breakout extends Application {
     private boolean moveRight = false;
     private AnimationTimer gameLoop;
     private boolean gameStop = false;
-    private int[] dy = {-1 , 0 , 1};
-    private int[] dx = {-1 , 0 , 1};
+    private int[] dboom = {-1 , 0 , 1};
     int score = 0;
     Label scoreLabel = new Label();
     private Canvas canvas;
@@ -157,23 +156,13 @@ public class Breakout extends Application {
                         Brick brick = bricks.get(i).get(j);
                         if (brick == null) continue;
                         if (ball.isCollisionDetected(brick)) {
-                            brick.crash();
+                            updateScore(brick.crash(ball, rows , cols, bricks, i , j, paddle));
                             ball.bounce(brick);
-                            if (brick instanceof BombBrick) {
-                                boomEffect(i, j, rows, cols, bricks);
-                            }
-                            else if (brick instanceof PaddleLengthBrick) {
-                                widePaddleEffect(paddle);
-                            }
                             if (brick.isDestroyed) {
-                                updateScore(brick);
-                                brick = null;
                                 bricks.get(i).set(j, null);
                             }
                         }
-                        if (brick != null) {
-                            brickCount++;
-                        }
+                        brickCount++;
                     }
                 }
                 shapes.removeIf(shape -> shape instanceof Brick && ((Brick) shape).isDestroyed);
@@ -237,29 +226,9 @@ public class Breakout extends Application {
         canvas.setFocusTraversable(false);
     }
 
-    private void updateScore(Brick brick) {
-        score += brick.getScore();
+    private void updateScore(int newScore) {
+        score += newScore;
         scoreLabel.setText("Score: " + score);
-    }
-
-    private static void widePaddleEffect(Paddle paddle) {
-        paddle.setWidth(paddle.getWidth() * 2);
-    }
-
-    private void boomEffect(int i, int j, int rows, int cols, List<List<Brick>> bricks) {
-        for (int k = 0; k < dy.length; k++) {
-            for (int l = 0; l < dy.length; l++) {
-                int ni = i + dy[k];
-                int nj = j + dy[l];
-                if (0 <= ni && 0<= nj && ni < rows && nj < cols) {
-                    Brick b = bricks.get(ni).get(nj);
-                    if (b == null) continue;
-                    b.setDestroyed(true);
-                    updateScore(b);
-                    bricks.get(ni).set(nj, null);
-                }
-            }
-        }
     }
 
     private void showGameOverPopup(Stage primaryStage) {

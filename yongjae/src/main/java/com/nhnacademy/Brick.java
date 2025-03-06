@@ -3,6 +3,8 @@ package com.nhnacademy;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.util.List;
+
 public class Brick extends Rectangle implements Drawable, Breakable {
     protected boolean isDestroyed; // 벽돌이 파괴되었는지 여부
     protected int HP;
@@ -44,7 +46,7 @@ public class Brick extends Rectangle implements Drawable, Breakable {
     public int getScore() {return score;}
 
     @Override
-    public void crash() {
+    public int crash(Ball ball, int rows, int cols, List<List<Brick>> bricks, int i, int j, Paddle paddle) {
         HP--;
         switch (HP) {
             case 0 -> isDestroyed = true;
@@ -53,5 +55,10 @@ public class Brick extends Rectangle implements Drawable, Breakable {
             case 3 -> color = Color.YELLOW;
             case 4 -> color = Color.GREEN;
         }
+        if (isDestroyed) {
+            return score;
+        }
+        else
+            return 0;
     }
 }
