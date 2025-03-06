@@ -84,10 +84,8 @@ public class Ball extends Circle implements Bounceable {
         for(Shape shape : shapes) {
             if(shape instanceof Collidable) {
                 Collidable collidable = (Collidable)shape;
-                if(collidable.isCollisionDetected(this) && (collidable instanceof Rectangle)) {
+                if((collidable instanceof Rectangle) && collidable.isCollisionDetected(this)) {
                     Rectangle rect = (Rectangle)collidable;
-                    // 객체 겹침 문제 해결
-                    //adjustPosition();
 
                     // Ball의 이전 위치 계산 (현재 위치 - 이동거리)
                     double prevX = this.getX() - dx;
@@ -119,11 +117,5 @@ public class Ball extends Circle implements Bounceable {
     @Override
     public void bounceY() {
         dy = -dy;
-    }
-
-    private void adjustPosition() {
-        // 겹침을 방지하기 위한 위치 조정
-        this.x -= dx * 2;
-        this.y -= dy * 2;
     }
 }

@@ -17,7 +17,7 @@ public class Brick extends Rectangle implements Breakable {
     public void draw(GraphicsContext gc) {
         if (!isDestroyed) {
             gc.setFill(color);
-            gc.fillRect(x, y, width, height); // 벽돌 그리기
+            gc.fillRect(getMinX(), getMinY(), width, height); // 벽돌 그리기
         }
     }
 
