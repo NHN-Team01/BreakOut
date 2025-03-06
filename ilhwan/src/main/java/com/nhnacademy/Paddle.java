@@ -39,8 +39,8 @@ public class Paddle extends Rectangle implements Movable, Collidable {
         }
         Ball ball = (Ball)other;
         
-        double closestX = clamp(ball.getX(), x, x + width);  // 공의 X좌표와 사각형의 X경계 사이의 값
-        double closestY = clamp(ball.getY(), y, y + height); // 공의 Y좌표와 사각형의 Y경계 사이의 값
+        double closestX = clamp(ball.getX(), this.getMinX(), this.getMaxX());  // 공의 X좌표와 사각형의 X경계 사이의 값
+        double closestY = clamp(ball.getY(), this.getMinY(), this.getMaxY()); // 공의 Y좌표와 사각형의 Y경계 사이의 값
 
         // 공의 중심과 사각형과의 가장 가까운 점 간의 거리를 계산
         double dx = ball.getX() - closestX;
@@ -49,13 +49,6 @@ public class Paddle extends Rectangle implements Movable, Collidable {
         // 거리가 공의 반지름보다 작으면 충돌
         boolean collision = (dx * dx + dy * dy) < (ball.getRadius() * ball.getRadius());
 
-        if(collision) {
-            // 두 객체가 겹치지 않게 충돌하지 않는 가장 가까운 위치로 이동
-            // (문제를 단순화 시키기 위해 충돌 시 이전 자리로 이동)
-            ball.setDx(-ball.getDx()); ball.setDy(-ball.getDy());
-            ball.move();
-            ball.setDx(-ball.getDx()); ball.setDy(-ball.getDy());
-        }
         return collision;
     }
 

@@ -66,26 +66,38 @@ public class Breakout extends Application {
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-                // 도형 객체 일괄 관리
                 for(Shape shape : shapes) {
-                    if(shape instanceof Drawable) {
-                        Drawable drawable = (Drawable)shape;
-                        drawable.draw(gc);
+                    if(shape instanceof Bounceable) {
+                        Bounceable bounceable = (Bounceable)shape;
+                        bounceable.bounce(shapes);
                     }
-                    // 벽돌 그리기 및 충돌 처리
-                    if(shape instanceof Brick) {
-                        Brick brick = (Brick)shape;
-                        if(brick.isCollisionDetected(ball)) {
-                            ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
+                }
+                List<Shape> objectsToRemove = new ArrayList<>();
+                for(Shape shape : shapes) {
+                    if(shape instanceof Breakable) {
+                        Breakable breakable = (Breakable)shape;
+                        if(breakable.isBroken()) {
+                            objectsToRemove.add(shape);
                         }
-                        brick.draw(gc);
                     }
+                }
+                for(Shape shape : shapes) {
                     // Movable 객체 이동 처리
                     if(shape instanceof Movable) {
                         Movable movable = (Movable)shape;
                         movable.move();
                     }
+                } 
+                for(Shape shape : shapes) {
+                    // Drawable 객체 그리기 처리
+                    if(shape instanceof Drawable) {
+                        Drawable drawable = (Drawable)shape;
+                        drawable.draw(gc);
+                    }
                 }
+                
+                // 순회가 끝난 후, 삭제할 객체들을 리스트에서 제거
+                shapes.removeAll(objectsToRemove);
 
                 ball.checkCollision(canvas.getWidth(), canvas.getHeight());
 
@@ -108,11 +120,6 @@ public class Breakout extends Application {
 
                 // Paddle 경계 확인 및 그리기
                 paddle.checkBounds(canvas.getWidth());
-
-                if (paddle.isCollisionDetected(ball)) {
-                    ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
-                }
-
             }
         };
         gameLoop.start();

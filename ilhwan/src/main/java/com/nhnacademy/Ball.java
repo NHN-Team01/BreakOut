@@ -1,8 +1,10 @@
 package com.nhnacademy;
 
+import java.util.List;
+
 import javafx.scene.paint.Color;
 
-public class Ball extends Circle implements Movable {
+public class Ball extends Circle implements Bounceable {
     private double dx; // 공의 x축 속도 (단위: 픽셀/프레임)
     private double dy; // 공의 y축 속도 (단위: 픽셀/프레임)
     private boolean isPaused = false;
@@ -73,5 +75,55 @@ public class Ball extends Circle implements Movable {
     @Override
     public void resume() {
         isPaused = false;
+    }
+
+    @Override
+    public void bounce(List<Shape> shapes) {
+        if(shapes == null) throw new IllegalArgumentException("매개변수는 null이 아니어야함");
+
+        for(Shape shape : shapes) {
+            if(shape instanceof Collidable) {
+                Collidable collidable = (Collidable)shape;
+                if(collidable.isCollisionDetected(this) && (collidable instanceof Rectangle)) {
+                    Rectangle rect = (Rectangle)collidable;
+                    // 객체 겹침 문제 해결
+                    //adjustPosition();
+
+                    // Ball의 이전 위치 계산 (현재 위치 - 이동거리)
+                    double prevX = this.getX() - dx;
+                    double prevY = this.getY() - dy;
+
+                    boolean wasLeft = prevX < rect.getMinX(); // 공이 충돌 전 왼쪽에 있었는가?
+                    boolean wasRight = prevX > rect.getMaxX(); // 공이 충돌 전 오른쪽에 있었는가?
+                    boolean wasAbove = prevY < rect.getMinY(); // 공이 충돌 전 위쪽에 있었는가?
+                    boolean wasBelow = prevY > rect.getMaxY(); // 공이 충돌 전 아래쪽에 있었는가?
+
+                    if((wasLeft && dx > 0) || (wasRight && dx < 0)) {
+                        bounceX(); // 좌우 충돌이면 X축 반전
+                    }
+                    if((wasAbove && dy > 0) || (wasBelow && dy < 0)) {
+                        bounceY(); // 상하 충돌이면 Y축 반전
+                    }
+                    
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void bounceX() {
+        dx = -dx;
+    }
+
+    @Override
+    public void bounceY() {
+        dy = -dy;
+    }
+
+    private void adjustPosition() {
+        // 겹침을 방지하기 위한 위치 조정
+        this.x -= dx * 2;
+        this.y -= dy * 2;
     }
 }
