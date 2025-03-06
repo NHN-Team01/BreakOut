@@ -22,21 +22,25 @@ public class Ball extends Circle implements Drawable, Movable{
         gc.fillOval(x - radius, y - radius, radius * 2, radius * 2); // 중심을 기준으로 원 그리기
     }
 
-    public void bounce(Shape other, double x, double y) {
-        if ((y == other.getMaxY() || y == other.getMinY())) {
-            dy = -dy;
-        }
-        if ((x == other.getMaxX() || x == other.getMinX())) {
+    public void bounce(Shape other, double closestX, double closestY) {
+        if (closestX == other.getMaxX() || closestX == other.getMinX()) {
             dx = -dx;
-            if (other instanceof Paddle paddle) {
-
-                System.out.println(System.currentTimeMillis()+":"+paddle.getDx());
-
-            }
-
         }
-//        move();
+        if (closestY == other.getMaxY() || closestY == other.getMinY()) {
+            dy = -dy;
+            if (other instanceof Paddle paddle) {
+                double paddleVelocity = paddle.getDx();
+                double maxSpeed = 8;
+                if (dx + paddleVelocity * 0.2 > maxSpeed) {
+                    dx = maxSpeed;
+                } else {
+                    dx += paddleVelocity * 0.2;
+                }
+            }
+        }
+        repositionAfterCollision(other);
     }
+
     @Override
     public boolean isCollisionDetected(Shape other) {
         // 원의 중심에서 가장 가까운 사각형 위의 점 찾기
@@ -72,5 +76,24 @@ public class Ball extends Circle implements Drawable, Movable{
     public void move() {
         x += dx;
         y += dy;
+    }
+
+    private void repositionAfterCollision(Shape other) {
+        double closestX = Math.max(other.getMinX(), Math.min(x, other.getMaxX()));
+        double closestY = Math.max(other.getMinY(), Math.min(y, other.getMaxY()));
+
+        double vx = x - closestX;
+        double vy = y - closestY;
+
+        double distance = Math.sqrt(vx * vx + vy * vy);
+
+        if (distance < radius) {
+            double nx = vx / distance;
+            double ny = vy / distance;
+
+            double overlap = radius - distance;
+            x += nx * (overlap+2);
+            y += ny * (overlap+2);
+        }
     }
 }

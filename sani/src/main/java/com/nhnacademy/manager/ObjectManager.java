@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class ObjectManager {
     private final List<Shape> shapes = new ArrayList<>();
@@ -19,7 +20,11 @@ public class ObjectManager {
     public void initializeGameObjects() {
         shapes.clear();
 
-        ball = new Ball(400, 300, 10, 3, 3, Color.RED);
+        Random random = new Random();
+        double dx = (random.nextDouble() - 0.5) * 6;
+        double dy = 3 + random.nextDouble() * 3;
+
+        ball = new Ball(400, 300, 10, dx, dy, Color.RED);
         shapes.add(ball);
 
         paddle = new Paddle(400, 550, 100, 20, 5, Color.BLUE);
