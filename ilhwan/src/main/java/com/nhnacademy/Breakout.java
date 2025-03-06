@@ -66,19 +66,13 @@ public class Breakout extends Application {
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-                // 도형 객체 일괄 관리
                 for(Shape shape : shapes) {
                     if(shape instanceof Bounceable) {
                         Bounceable bounceable = (Bounceable)shape;
                         bounceable.bounce(shapes);
                     }
                 }
-                // for(Shape shape : shapes) {
-                //     if(shape instanceof Ball) {
-                //         Ball ball = (Ball)shape;
-                //         ball.resolveOverlap(shapes); // Ball에 대한 겹침 방지 처리
-                //     }
-                // }
+                
                 for(Shape shape : shapes) {
                     // Movable 객체 이동 처리
                     if(shape instanceof Movable) {

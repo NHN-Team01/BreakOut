@@ -85,6 +85,7 @@ public class Ball extends Circle implements Bounceable {
             if(shape instanceof Collidable) {
                 Collidable collidable = (Collidable)shape;
                 if(collidable.isCollisionDetected(this) && (collidable instanceof Rectangle)) {
+                    adjustPosition();
                     Rectangle rect = (Rectangle)collidable;
 
                     // 공과 사각형의 경계를 비교하여 어느 축에서 충돌했는지 판별
@@ -123,18 +124,6 @@ public class Ball extends Circle implements Bounceable {
     @Override
     public void bounceY() {
         dy = -dy;
-    }
-
-    public void resolveOverlap(List<Shape> shapes) {
-        for(Shape shape : shapes) {
-            if(shape instanceof Collidable) {
-                Collidable collidable = (Collidable)shape;
-                if(collidable.isCollisionDetected(this)) {
-                    adjustPosition(); // 겹침이 발생한 경우 위치 조정
-                    break; // 겹침을 해결한 후에는 더 이상 확인하지 않음
-                }
-            }
-        }
     }
 
     private void adjustPosition() {
