@@ -46,11 +46,6 @@ public class Brick extends Rectangle implements Collidable {
 
         if (collision) {
             isDestroyed = true; // 벽돌 파괴
-            // 두 객체가 겹치지 않게 충돌하지 않는 가장 가까운 위치로 이동
-            // (문제를 단순화 시키기 위해 충돌 시 이전 자리로 이동)
-            ball.setDx(-ball.getDx()); ball.setDy(-ball.getDy());
-            ball.move();
-            ball.setDx(-ball.getDx()); ball.setDy(-ball.getDy());
         }
 
         return collision;

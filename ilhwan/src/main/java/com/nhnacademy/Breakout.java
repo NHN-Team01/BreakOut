@@ -68,22 +68,29 @@ public class Breakout extends Application {
 
                 // 도형 객체 일괄 관리
                 for(Shape shape : shapes) {
-                    if(shape instanceof Drawable) {
-                        Drawable drawable = (Drawable)shape;
-                        drawable.draw(gc);
+                    if(shape instanceof Bounceable) {
+                        Bounceable bounceable = (Bounceable)shape;
+                        bounceable.bounce(shapes);
                     }
-                    // 벽돌 그리기 및 충돌 처리
-                    if(shape instanceof Brick) {
-                        Brick brick = (Brick)shape;
-                        if(brick.isCollisionDetected(ball)) {
-                            ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
-                        }
-                        brick.draw(gc);
-                    }
+                }
+                // for(Shape shape : shapes) {
+                //     if(shape instanceof Ball) {
+                //         Ball ball = (Ball)shape;
+                //         ball.resolveOverlap(shapes); // Ball에 대한 겹침 방지 처리
+                //     }
+                // }
+                for(Shape shape : shapes) {
                     // Movable 객체 이동 처리
                     if(shape instanceof Movable) {
                         Movable movable = (Movable)shape;
                         movable.move();
+                    }
+                } 
+                for(Shape shape : shapes) {
+                    // Drawable 객체 그리기 처리
+                    if(shape instanceof Drawable) {
+                        Drawable drawable = (Drawable)shape;
+                        drawable.draw(gc);
                     }
                 }
 
@@ -108,11 +115,6 @@ public class Breakout extends Application {
 
                 // Paddle 경계 확인 및 그리기
                 paddle.checkBounds(canvas.getWidth());
-
-                if (paddle.isCollisionDetected(ball)) {
-                    ball.setDy(-ball.getDy()); // 충돌 시 공의 y 방향 반전
-                }
-
             }
         };
         gameLoop.start();
