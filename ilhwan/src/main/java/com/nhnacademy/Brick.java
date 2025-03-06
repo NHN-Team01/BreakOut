@@ -3,7 +3,7 @@ package com.nhnacademy;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Brick extends Rectangle implements Collidable {
+public class Brick extends Rectangle implements Breakable {
     private boolean isDestroyed; // 벽돌이 파괴되었는지 여부
 
     // 생성자
@@ -81,5 +81,16 @@ public class Brick extends Rectangle implements Collidable {
 
     public double getHeight() {
         return height;
+    }
+
+    @Override
+    public void hit() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'hit'");
+    }
+
+    @Override
+    public boolean isBroken() {
+        return isDestroyed;
     }
 }

@@ -72,7 +72,15 @@ public class Breakout extends Application {
                         bounceable.bounce(shapes);
                     }
                 }
-                
+                List<Shape> objectsToRemove = new ArrayList<>();
+                for(Shape shape : shapes) {
+                    if(shape instanceof Breakable) {
+                        Breakable breakable = (Breakable)shape;
+                        if(breakable.isBroken()) {
+                            objectsToRemove.add(shape);
+                        }
+                    }
+                }
                 for(Shape shape : shapes) {
                     // Movable 객체 이동 처리
                     if(shape instanceof Movable) {
@@ -87,6 +95,9 @@ public class Breakout extends Application {
                         drawable.draw(gc);
                     }
                 }
+                
+                // 순회가 끝난 후, 삭제할 객체들을 리스트에서 제거
+                shapes.removeAll(objectsToRemove);
 
                 ball.checkCollision(canvas.getWidth(), canvas.getHeight());
 
