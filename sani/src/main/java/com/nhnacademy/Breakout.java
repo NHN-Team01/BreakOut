@@ -1,12 +1,12 @@
 package com.nhnacademy;
 
+import com.nhnacademy.manager.ObjectManager;
 import com.nhnacademy.manager.ViewManager;
 import com.nhnacademy.shapes.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -16,44 +16,18 @@ public class Breakout extends Application {
     private boolean moveLeft;
     private boolean moveRight;
     private AnimationTimer gameLoop;
-    private List<Shape> shapes = new ArrayList<>();
     int score;
-    private Paddle paddle;
-    private Ball ball;
+
     private ViewManager viewManager;
+    private final ObjectManager objectManager = new ObjectManager();
 
     private void initializeGame() {
-        shapes.clear();
+
         score = 0;
         moveLeft = false;
         moveRight = false;
+        objectManager.initializeGameObjects();
 
-        ball = new Ball(400, 300, 10, 3, 3, Color.RED);
-        shapes.add(ball);
-
-        paddle = new Paddle(400, 550, 100, 20, 5, Color.BLUE);
-        shapes.add(paddle);
-
-        int rows = 5;
-        int cols = 8;
-        double brickWidth = 95;
-        double brickHeight = 20;
-        double padding = 5;
-        double startX = 50;
-        double startY = 50;
-
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                double x = startX + col * (brickWidth + padding);
-                double y = startY + row * (brickHeight + padding);
-                shapes.add(new Brick(x, y, brickWidth, brickHeight, Color.BLUE));
-            }
-        }
-
-        shapes.add(new Wall(0, 300, 10, 600)); // 왼쪽 벽
-        shapes.add(new Wall(800, 300, 10, 600)); // 오른쪽 벽
-        shapes.add(new Wall(400, 0, 800, 10)); // 상단 벽
-        shapes.add(new Obstacle(400, 600, 800, 10)); // 하단 벽
     }
 
     @Override
@@ -71,45 +45,40 @@ public class Breakout extends Application {
                     return;
                 }
 
-                // 입력에 따른 패들 속도 설정
                 if (moveLeft) {
-                    paddle.moveLeft();
+                    objectManager.getPaddle().moveLeft();
                 } else if (moveRight) {
-                    paddle.moveRight();
+                    objectManager.getPaddle().moveRight();
                 } else {
-                    paddle.setDx(0);
+                    objectManager.getPaddle().setDx(0);
                 }
 
-                //먼저 모든 이동 가능한 객체 이동
-                for (Shape shape : shapes) {
+                List<Brick> bricksToRemove = new ArrayList<>();
+
+                for (Shape shape : objectManager.getShapes()) {
                     if (shape instanceof Movable movable) {
                         movable.move();
                     }
-                }
 
-                //충돌 체크 및 처리
-                List<Brick> bricksToRemove = new ArrayList<>();
-
-                for (Shape shape : shapes) {
                     if (shape instanceof Wall wall) {
-                        paddle.isCollisionDetected(wall);
+                        objectManager.getPaddle().isCollisionDetected(wall);
                     }
-                    if (shape != ball && ball.isCollisionDetected(shape)) {
+
+                    if (shape != objectManager.getBall() && objectManager.getBall().isCollisionDetected(shape)) {
                         if (shape instanceof Brick brick) {
                             score += 10;
-                            bricksToRemove.add(brick); // 제거할 벽돌 목록에 추가
+                            bricksToRemove.add(brick);
                         }
                         if (shape instanceof Blockable) {
                             viewManager.showGameOverPopup(score, Breakout.this::initializeGame);
                             return;
                         }
-                        break;
                     }
                 }
 
-                shapes.removeAll(bricksToRemove);
+                objectManager.removeAllByShape(bricksToRemove);
 
-                viewManager.render(shapes, score);
+                viewManager.render(objectManager.getShapes(), score);
             }
         };
         gameLoop.start();
