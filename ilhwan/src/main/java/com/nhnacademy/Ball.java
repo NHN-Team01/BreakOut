@@ -85,31 +85,26 @@ public class Ball extends Circle implements Bounceable {
             if(shape instanceof Collidable) {
                 Collidable collidable = (Collidable)shape;
                 if(collidable.isCollisionDetected(this) && (collidable instanceof Rectangle)) {
-                    adjustPosition();
                     Rectangle rect = (Rectangle)collidable;
+                    // 객체 겹침 문제 해결
+                    //adjustPosition();
 
-                    // 공과 사각형의 경계를 비교하여 어느 축에서 충돌했는지 판별
-                    double leftDist = Math.abs(this.getX() - rect.getMinX());  // 공과 브릭의 왼쪽 경계
-                    double rightDist = Math.abs(this.getX() - rect.getMaxX()); // 공과 브릭의 오른쪽 경계
-                    double topDist = Math.abs(this.getY() - rect.getMinY());   // 공과 브릭의 위쪽 경계
-                    double bottomDist = Math.abs(this.getY() - rect.getMaxY()); // 공과 브릭의 아래쪽 경계
+                    // Ball의 이전 위치 계산 (현재 위치 - 이동거리)
+                    double prevX = this.getX() - dx;
+                    double prevY = this.getY() - dy;
 
-                    // 각 축에 대해 충돌한 최소 거리를 찾아서 방향을 결정
-                    double minXDist = Math.min(leftDist, rightDist);
-                    double minYDist = Math.min(topDist, bottomDist);
-                
-                    // 충돌한 축을 판단하여 반사 처리
-                    if (minXDist < minYDist) {
-                        bounceX(); // X축 충돌
-                    } else {
-                        bounceY(); // Y축 충돌
+                    boolean wasLeft = prevX < rect.getMinX(); // 공이 충돌 전 왼쪽에 있었는가?
+                    boolean wasRight = prevX > rect.getMaxX(); // 공이 충돌 전 오른쪽에 있었는가?
+                    boolean wasAbove = prevY < rect.getMinY(); // 공이 충돌 전 위쪽에 있었는가?
+                    boolean wasBelow = prevY > rect.getMaxY(); // 공이 충돌 전 아래쪽에 있었는가?
+
+                    if((wasLeft && dx > 0) || (wasRight && dx < 0)) {
+                        bounceX(); // 좌우 충돌이면 X축 반전
                     }
-
-                    // 모서리와의 충돌이 발생한 경우 두 방향 모두 반전
-                    if (minXDist == minYDist) {
-                        bounceX();
-                        bounceY();
+                    if((wasAbove && dy > 0) || (wasBelow && dy < 0)) {
+                        bounceY(); // 상하 충돌이면 Y축 반전
                     }
+                    
                     return;
                 }
             }

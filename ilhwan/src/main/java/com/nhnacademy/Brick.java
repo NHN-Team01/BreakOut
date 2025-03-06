@@ -34,8 +34,8 @@ public class Brick extends Rectangle implements Breakable {
         Ball ball = (Ball)other;
 
         // 공이 벽돌의 경계와 충돌했는지 확인
-        double closestX = clamp(ball.getX(), x, x + width);  // 공의 X좌표와 사각형의 X경계 사이의 값
-        double closestY = clamp(ball.getY(), y, y + height); // 공의 Y좌표와 사각형의 Y경계 사이의 값
+        double closestX = clamp(ball.getX(), this.getMinX(), this.getMaxX());  // 공의 X좌표와 사각형의 X경계 사이의 값
+        double closestY = clamp(ball.getY(), this.getMinY(), this.getMaxY()); // 공의 Y좌표와 사각형의 Y경계 사이의 값
 
         // 공의 중심과 사각형과의 가장 가까운 점 간의 거리를 계산
         double dx = ball.getX() - closestX;
