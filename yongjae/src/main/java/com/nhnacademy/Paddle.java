@@ -3,71 +3,105 @@ package com.nhnacademy;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Paddle {
-    private double x; // 패들의 중심 x 좌표
-    private double y; // 패들의 중심 y 좌표
-    private double width; // 패들의 너비
-    private double height; // 패들의 높이
+public class Paddle extends Rectangle implements Drawable, Movable {
     private double speed; // 패들의 이동 속도
-    private Color color; // 패들의 색상
-
+    private boolean paused;
+    private boolean moveLeft = false;
+    private boolean moveRight = false;
     // 생성자
     public Paddle(double x, double y, double width, double height, double speed, Color color) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        super(x, y, width, height);
         this.speed = speed;
         this.color = color;
     }
 
-    // 패들을 그리는 메서드
+    // 벽돌을 그리는 메서드
+    @Override
     public void draw(GraphicsContext gc) {
         gc.setFill(color);
-        gc.fillRect(x - width / 2, y - height / 2, width, height); // 중심을 기준으로 사각형 그리기
-    }
-
-    // 패들의 위치를 왼쪽으로 이동
-    public void moveLeft() {
-        x -= speed;
-    }
-
-    // 패들의 위치를 오른쪽으로 이동
-    public void moveRight() {
-        x += speed;
-    }
-
-    public boolean checkCollision(Ball ball) {
-        // 공이 패들의 경계와 충돌했는지 확인
-        return ball.getX() + ball.getRadius() > x &&
-                ball.getX() - ball.getRadius() < x + width &&
-                ball.getY() + ball.getRadius() > y &&
-                ball.getY() - ball.getRadius() < y + height;
-    }
-
-    // 패들이 화면 경계를 벗어나지 않도록 제한
-    public void checkBounds(double canvasWidth) {
-        if (x - width / 2 < 0) { // 왼쪽 경계
-            x = width / 2;
-        } else if (x + width / 2 > canvasWidth) { // 오른쪽 경계
-            x = canvasWidth - width / 2;
-        }
+        gc.fillRect(x, y, width, height); // 벽돌 그리기
     }
 
     // Getter와 Setter (필요 시 사용)
-    public double getX() {
-        return x;
+    public void setWidth(double width) {
+        this.width = width;
     }
 
-    public double getY() {
-        return y;
+    public void setX(double x) {
+        this.x = x;
     }
 
-    public double getWidth() {
-        return width;
+    public void setMoveLeft(boolean moveLeft) {
+        this.moveLeft = moveLeft;
     }
 
-    public double getHeight() {
-        return height;
+    public boolean getMoveLeft() {
+        return moveLeft;
+    }
+
+    public void setMoveRight(boolean moveRight) {
+        this.moveRight = moveRight;
+    }
+
+    public boolean getMoveRight() {
+        return moveRight;
+    }
+
+    @Override
+    public void move() {
+        if (!paused && (moveLeft || moveRight)) {
+            x += speed;
+        }
+    }
+
+    @Override
+    public double getDx() {
+        return speed;
+    }
+
+    @Override
+    public double getDy() {
+        return 0;
+    }
+
+    @Override
+    public void setDx(double dx) {
+        speed = dx;
+    }
+
+    @Override
+    public void setDy(double dy) {
+    }
+
+    @Override
+    public void pause() {
+        paused = true;
+    }
+
+    @Override
+    public void resume() {
+        paused = false;
+    }
+
+    @Override
+    public boolean isCollisionDetected(Shape other) {
+        if (other instanceof Wall wall) {
+            if (wall.getWidth() == 0) {
+                if (wall.getX() == 0 &&  x < 0) {
+                    x = 0;
+                }
+                if (wall.getX() == 800 && getMaxX() > 800) {
+                    x = 800 - width;
+                }
+                return true;
+            }
+        }
+        else if (other instanceof Ball ball) {
+            return ball.getX() + ball.getRadius() > x &&
+                    ball.getX() - ball.getRadius() < x + width &&
+                    ball.getY() + ball.getRadius() > y &&
+                    ball.getY() - ball.getRadius() < y + height;
+        }
+        return false;
     }
 }
