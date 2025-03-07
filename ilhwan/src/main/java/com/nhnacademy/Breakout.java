@@ -100,20 +100,12 @@ public class Breakout extends Application implements GameEventListener {
                         movable.move();
                     }
                 } 
-                for(Shape shape : shapes) {
-                    // Drawable 객체 그리기 처리
-                    if(shape instanceof Drawable) {
-                        Drawable drawable = (Drawable)shape;
-                        drawable.draw(gc);
-                    }
-                }
-                
-                // 순회가 끝난 후, 삭제할 객체들을 리스트에서 제거
-                shapes.removeAll(objectsToRemove);
-
                 // Paddle 경계 확인 및 그리기
                 paddle.checkBounds(leftWall);
                 paddle.checkBounds(rightWall);
+                
+                // 순회가 끝난 후, 삭제할 객체들을 리스트에서 제거
+                shapes.removeAll(objectsToRemove);
 
                 // 화면의 하단에 닿으면 게임 오버
                 if(bottomWall.isCollisionDetected(ball)) {
@@ -129,6 +121,14 @@ public class Breakout extends Application implements GameEventListener {
                 } 
                 if (moveLeft == moveRight) { // 방향키가 동시에 눌러져 있거나 둘다 눌러져있지 않을 때 패들 속도 0으로 설정
                     paddle.setDx(0);
+                }
+
+                for(Shape shape : shapes) {
+                    // Drawable 객체 그리기 처리
+                    if(shape instanceof Drawable) {
+                        Drawable drawable = (Drawable)shape;
+                        drawable.draw(gc);
+                    }
                 }
             }
         };
