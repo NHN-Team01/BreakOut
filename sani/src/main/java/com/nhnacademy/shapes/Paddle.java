@@ -56,13 +56,13 @@ public class Paddle extends Rectangle implements Drawable, Movable{
 
         if (isCollision) {
             if (other instanceof Wall) {
-                if (getDx() > 0) {
+                if (dx > 0) {
                     x = other.getMinX() - width / 2;
-                } else if (getDx() < 0) {
+                } else if (dx < 0) {
                     x = other.getMaxX() + width / 2;
                 }
 
-                setDx(0);
+                dx = 0;
             }
             return true;
         }

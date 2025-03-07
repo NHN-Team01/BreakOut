@@ -56,19 +56,19 @@ public class ViewManager {
         }
     }
 
-    public void showGameOverPopup(int finalScore, Runnable onRestart) {
+    public void showGameEndPopup(int finalScore, Runnable onRestart, String title, String message) {
         gameStop = true;
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.NONE);
-            alert.setTitle("Game Over");
+            alert.setTitle(title);
 
             // 사용자 정의 메시지 및 스타일
             VBox content = new VBox(10);
             content.setAlignment(Pos.CENTER);
 
-            Label gameOverLabel = createStyledLabel("Game Over!", "-fx-font-size: 24px; -fx-font-weight: bold;");
+            Label gameOverLabel = createStyledLabel(message, "-fx-font-size: 24px; -fx-font-weight: bold;");
 
-            Label scoreLabel = createStyledLabel("최종 점수:  " + finalScore , "-fx-font-size: 18px;");
+            Label scoreLabel = createStyledLabel("최종 점수:  " + finalScore, "-fx-font-size: 18px;");
 
             // 버튼 생성
             ButtonType restartButton = new ButtonType("다시 시작", ButtonBar.ButtonData.OK_DONE);
