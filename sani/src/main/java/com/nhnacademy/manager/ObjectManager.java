@@ -14,15 +14,16 @@ public class ObjectManager {
 //    private List<Ball> balls = new ArrayList<>();
 
     public ObjectManager(){
-        initializeGameObjects();
     }
 
     public void initializeGameObjects() {
         shapes.clear();
 
-        Random random = new Random();
-        double dx = (random.nextDouble() - 0.5) * 6;
-        double dy = 3 + random.nextDouble() * 3;
+        double speed = 6;
+        double[] angles = {Math.PI / 3, 2 * Math.PI / 3};
+        double angle = angles[new Random().nextInt(angles.length)];
+        double dx = speed * Math.cos(angle);
+        double dy = speed * Math.sin(angle);
 
         ball = new Ball(400, 300, 10, dx, dy, Color.RED);
         shapes.add(ball);
