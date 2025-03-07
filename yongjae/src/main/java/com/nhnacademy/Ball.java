@@ -70,19 +70,12 @@ public class Ball extends Circle implements Drawable, Movable, Bounceable {
                 return ballX - ballRadius <= wall.getX() && ballX + ballRadius >= wall.getX();
             }
         }
-        else if (other instanceof Brick brick) {
-            if (brick.destroyed) return false;
+        else if (other instanceof Rectangle rectangle) {
             // 공이 벽돌의 경계와 충돌했는지 확인
-            return ballX + ballRadius > brick.getX() &&
-                    ballX - ballRadius < brick.getMaxX() &&
-                    ballY + ballRadius > brick.getY() &&
-                    ballY - ballRadius < brick.getMaxY();
-        }
-        else if (other instanceof Paddle paddle) {
-            return ballX + ballRadius > paddle.getX() &&
-                    ballX - ballRadius < paddle.getMaxX() &&
-                    ballY + ballRadius > paddle.getY() &&
-                    ballY - ballRadius < paddle.getMaxY();
+            return ballX + ballRadius > rectangle.getX() &&
+                    ballX - ballRadius < rectangle.getMaxX() &&
+                    ballY + ballRadius > rectangle.getY() &&
+                    ballY - ballRadius < rectangle.getMaxY();
         }
         return false;
     }
