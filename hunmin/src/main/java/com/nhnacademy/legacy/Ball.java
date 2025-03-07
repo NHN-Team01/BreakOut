@@ -1,4 +1,4 @@
-package com.nhnacademy;
+package com.nhnacademy.legacy;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
