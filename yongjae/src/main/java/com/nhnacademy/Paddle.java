@@ -6,6 +6,8 @@ import javafx.scene.paint.Color;
 public class Paddle extends Rectangle implements Drawable, Movable {
     private double speed; // 패들의 이동 속도
     private boolean paused;
+    private boolean moveLeft = false;
+    private boolean moveRight = false;
     // 생성자
     public Paddle(double x, double y, double width, double height, double speed, Color color) {
         super(x, y, width, height);
@@ -29,9 +31,25 @@ public class Paddle extends Rectangle implements Drawable, Movable {
         this.x = x;
     }
 
+    public void setMoveLeft(boolean moveLeft) {
+        this.moveLeft = moveLeft;
+    }
+
+    public boolean getMoveLeft() {
+        return moveLeft;
+    }
+
+    public void setMoveRight(boolean moveRight) {
+        this.moveRight = moveRight;
+    }
+
+    public boolean getMoveRight() {
+        return moveRight;
+    }
+
     @Override
     public void move() {
-        if (!paused) {
+        if (!paused && (moveLeft || moveRight)) {
             x += speed;
         }
     }
@@ -67,14 +85,18 @@ public class Paddle extends Rectangle implements Drawable, Movable {
 
     @Override
     public boolean isCollisionDetected(Shape other) {
-        if (other instanceof Wall) {
-            Wall wall = (Wall) other;
-            if (wall.width == 0 && (this.x < wall.x && wall.x < this.x + this.width)) {
+        if (other instanceof Wall wall) {
+            if (wall.getWidth() == 0) {
+                if (wall.getX() == 0 &&  x < 0) {
+                    x = 0;
+                }
+                if (wall.getX() == 800 && getMaxX() > 800) {
+                    x = 800 - width;
+                }
                 return true;
             }
         }
-        else if (other instanceof Ball) {
-            Ball ball = (Ball) other;
+        else if (other instanceof Ball ball) {
             return ball.getX() + ball.getRadius() > x &&
                     ball.getX() - ball.getRadius() < x + width &&
                     ball.getY() + ball.getRadius() > y &&

@@ -1,5 +1,8 @@
 package com.nhnacademy;
 
+import com.nhnacademy.effect.BombEffect;
+import com.nhnacademy.effect.PaddleLengthEffect;
+import com.nhnacademy.effect.SpeedUpEffect;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -16,14 +19,12 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Breakout extends Application {
-    private boolean moveLeft = false;
-    private boolean moveRight = false;
     private AnimationTimer gameLoop;
     private boolean gameStop = false;
-    private int[] dboom = {-1 , 0 , 1};
     int score = 0;
     Label scoreLabel = new Label();
     private Canvas canvas;
@@ -34,8 +35,6 @@ public class Breakout extends Application {
     public void start(Stage primaryStage) {
         gameStop = false;
         score = 0;
-        moveLeft = false;
-        moveRight = false;
 
         // Canvas 생성
         if (canvas == null) {
@@ -56,20 +55,19 @@ public class Breakout extends Application {
         shapes.add(paddle);
 
         // Wall 생성
-        Wall[] walls = new Wall[3];
-        walls[0] = new Wall(0, 0 , 800, 0);
-        walls[1] = new Wall(0, 0 , 0, 600);
-        walls[2] = new Wall(800, 0 , 0, 600);
+        Wall[] walls = {
+                new Wall(0, 0 , 800, 0),
+                new Wall(0, 0 , 0, 600),
+                new Wall(800, 0 , 0, 600)
+        };
+        shapes.addAll(Arrays.asList(walls));
         Block block = new Block(0, 600 , 800, 0);
-        shapes.add(walls[0]);
-        shapes.add(walls[1]);
-        shapes.add(walls[2]);
         shapes.add(block);
 
         // 벽돌 생성
-        List<List<Brick>> bricks = new ArrayList<>();
         int rows = 5;
         int cols = 10;
+        Brick[][] bricks = new Brick[rows][cols];
         double brickWidth = 70;
         double brickHeight = 20;
         double padding = 5;
@@ -77,26 +75,25 @@ public class Breakout extends Application {
         double startY = 50;
 
         for (int row = 0; row < rows; row++) {
-            bricks.add(new ArrayList<>());
             for (int col = 0; col < cols; col++) {
                 double x = startX + col * (brickWidth + padding);
                 double y = startY + row * (brickHeight + padding);
                 Brick temp;
                 if ((row == 3 && col == 2) || (row == 3 && col == 7)) {
-                    temp = new BombBrick(x, y, brickWidth, brickHeight);
-                    bricks.get(row).add(temp);
+                    temp = new Brick(x, y, brickWidth, brickHeight, 1, new BombEffect(rows, cols, bricks, row, col));
+                    bricks[row][col] = temp;
                 }
                 else if (row == 4 && col == 4) {
-                    temp = new PaddleLengthBrick(x, y, brickWidth, brickHeight);
-                    bricks.get(row).add(temp);
+                    temp = new Brick(x, y, brickWidth, brickHeight, 1, new PaddleLengthEffect(paddle));
+                    bricks[row][col] = temp;
                 }
                 else if (row == 4 && col == 0) {
-                    temp = new SpeedUpBrick(x, y, brickWidth, brickHeight);
-                    bricks.get(row).add(temp);
+                    temp = new Brick(x, y, brickWidth, brickHeight, 1, new SpeedUpEffect(ball));
+                    bricks[row][col] = temp;
                 }
                 else {
-                    temp = new Brick(x, y, brickWidth, brickHeight, (int) (Math.random()*5) + 1);
-                    bricks.get(row).add(temp);
+                    temp = new Brick(x, y, brickWidth, brickHeight, (int) (Math.random()*5) + 1, null);
+                    bricks[row][col] = temp;
                 }
                 shapes.add(temp);
             }
@@ -118,65 +115,50 @@ public class Breakout extends Application {
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-                // Ball 업데이트 및 그리기
-                ball.move();
-                for(int i = 0; i < 3; i++) {
-                    if (ball.isCollisionDetected(walls[i])){
-                        ball.bounce(walls[i]);
-                    }
-                }
-
-                // 아랫벽과 부딪치는 패배 조건
-                if (ball.isCollisionDetected(block)) {
-                    gameStop = true;
-                    showGameOverPopup(primaryStage); // 팝업 출력
-                }
 
                 // Paddle 움직임 처리
-                if (moveLeft) {
+                if (paddle.getMoveLeft()) {
                     paddle.setDx(-5);
-                    paddle.move();
                 }
-                if (moveRight) {
+                if (paddle.getMoveRight()) {
                     paddle.setDx(5);
-                    paddle.move();
-                }
-
-                // Paddle 경계 확인 및 그리기
-                if (paddle.isCollisionDetected(walls[1])){
-                    paddle.setX(walls[1].getX());
-                }
-                if (paddle.isCollisionDetected(walls[2])){
-                    paddle.setX(walls[2].getX() - paddle.getWidth());
-                }
-
-                if (paddle.isCollisionDetected(ball)) {
-                    ball.bounce(paddle); // 충돌 시 공의 y 방향 반전
                 }
 
                 // 벽돌 그리기 및 충돌 처리
-                for (int i = 0; i < bricks.size(); i++) {
-                    for (int j = 0; j < bricks.get(i).size(); j++) {
-                        Brick brick = bricks.get(i).get(j);
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        Brick brick = bricks[i][j];
                         if (brick == null) continue;
                         if (ball.isCollisionDetected(brick)) {
-                            updateScore(brick.crash(ball, rows , cols, bricks, i , j, paddle));
-                            ball.bounce(brick);
-                            if (brick.isDestroyed) {
-                                bricks.get(i).set(j, null);
+                            updateScore(brick.crash());
+                            if (brick.isDestroyed()) {
+                                bricks[i][j] = null;
                             }
                         }
                         brickCount++;
                     }
                 }
-                shapes.removeIf(shape -> shape instanceof Brick && ((Brick) shape).isDestroyed);
+                shapes.removeIf(shape -> shape instanceof Brick brick && brick.isDestroyed());
                 for (Shape shape : shapes) {
-                    if (shape instanceof Drawable) {
-                        Drawable drawable = (Drawable) shape;
+                    if (shape instanceof Drawable drawable) {
                         drawable.draw(gc);
                     }
+                    if (shape instanceof Movable movable) {
+                        movable.move();
+                        for (Shape other : shapes) {
+                            if (movable.isCollisionDetected(other)) {
+                                if (movable instanceof Bounceable bounceable) {
+                                    if (other instanceof Blockable) { // 게임 종료 조건
+                                        gameStop = true;
+                                        showGameOverPopup(primaryStage); // 팝업 출력
+                                    }
+                                    bounceable.bounce(other);
+                                }
+                            }
+                        }
+                    }
                 }
-                if (brickCount == 0) {
+                if (brickCount == 0) { //게임 승리 조건
                     gameStop = true;
                     showGameClearPopup();
                 }
@@ -198,9 +180,9 @@ public class Breakout extends Application {
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.LEFT) {
-                moveLeft = true;
+                paddle.setMoveLeft(true);
             } else if (event.getCode() == KeyCode.RIGHT) {
-                moveRight = true;
+                paddle.setMoveRight(true);
             }
             else if (event.getCode() == KeyCode.SPACE) {
                 if (ball.isPaused()) {
@@ -216,9 +198,9 @@ public class Breakout extends Application {
 
         scene.setOnKeyReleased(event -> {
             if (event.getCode() == KeyCode.LEFT) {
-                moveLeft = false;
+                paddle.setMoveLeft(false);
             } else if (event.getCode() == KeyCode.RIGHT) {
-                moveRight = false;
+                paddle.setMoveRight(false);
             }
         });
 

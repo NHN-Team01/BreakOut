@@ -27,6 +27,10 @@ public abstract class Rectangle extends Shape {
         return y;
     }
 
+    public double getMaxX() { return x + width; }
+
+    public double getMaxY() { return y + height; }
+
     public double getWidth() {
         return width;
     }

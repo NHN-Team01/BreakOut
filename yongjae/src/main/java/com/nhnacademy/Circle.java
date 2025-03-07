@@ -10,7 +10,7 @@ public abstract class Circle extends Shape {
     protected Color color; // 공의 색상
 
     // 생성자
-    public Circle(double x, double y, double radius, Color color) {
+    protected Circle(double x, double y, double radius, Color color) {
         this.x = x;
         this.y = y;
         this.radius = radius;

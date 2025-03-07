@@ -62,42 +62,34 @@ public class Ball extends Circle implements Drawable, Movable, Bounceable {
         double ballX = this.getX();
         double ballY = this.getY();
         double ballRadius = this.getRadius();
-        if (other instanceof Wall) {
-            Wall wall = (Wall) other;
-            if (wall.height == 0) {
-                if (ballY - ballRadius <= wall.getY() && ballY + ballRadius >= wall.getY()) {
-                    return true;
-                }
+        if (other instanceof Wall wall) {
+            if (wall.getHeight() == 0) {
+                return ballY - ballRadius <= wall.getY() && ballY + ballRadius >= wall.getY();
             }
-            else if (wall.width == 0) {
-                if (ballX - ballRadius <= wall.getX() && ballX + ballRadius >= wall.getX()) {
-                    return true;
-                }
+            else if (wall.getWidth() == 0) {
+                return ballX - ballRadius <= wall.getX() && ballX + ballRadius >= wall.getX();
             }
         }
-        else if (other instanceof Brick) {
-            Brick brick = (Brick) other;
-            if (brick.isDestroyed) return false;
+        else if (other instanceof Brick brick) {
+            if (brick.destroyed) return false;
             // 공이 벽돌의 경계와 충돌했는지 확인
-            return ballX + ballRadius > brick.x &&
-                    ballX - ballRadius < brick.x + brick.width &&
-                    ballY + ballRadius > brick.y &&
-                    ballY - ballRadius < brick.y + brick.height;
+            return ballX + ballRadius > brick.getX() &&
+                    ballX - ballRadius < brick.getMaxX() &&
+                    ballY + ballRadius > brick.getY() &&
+                    ballY - ballRadius < brick.getMaxY();
         }
-        else if (other instanceof Paddle) {
-            Paddle paddle = (Paddle) other;
-            return ballX + ballRadius > paddle.x &&
-                    ballX - ballRadius < paddle.x + paddle.width &&
-                    ballY + ballRadius > paddle.y &&
-                    ballY - ballRadius < paddle.y + paddle.height;
+        else if (other instanceof Paddle paddle) {
+            return ballX + ballRadius > paddle.getX() &&
+                    ballX - ballRadius < paddle.getMaxX() &&
+                    ballY + ballRadius > paddle.getY() &&
+                    ballY - ballRadius < paddle.getMaxY();
         }
         return false;
     }
 
     @Override
     public void bounce(Shape shape) {
-        if (shape instanceof Wall) {
-            Wall wall = (Wall) shape;
+        if (shape instanceof Wall wall) {
             if (wall.width == 0) {
                 dx = -dx;
             }
@@ -105,34 +97,42 @@ public class Ball extends Circle implements Drawable, Movable, Bounceable {
                 dy = -dy;
             }
         }
-        else if (shape instanceof Rectangle) {
-            Rectangle rectangle = (Rectangle) shape;
-            if(rectangle.x > x && rectangle.y > y && radius * radius > Math.sqrt(x - rectangle.x) + Math.sqrt(y - rectangle.y)) {
+        else if (shape instanceof Rectangle rectangle) {
+            if(isCollidingWithRectangleVertex(rectangle)) {
                 dx = -dx;
                 dy = -dy;
             }
-            else if (rectangle.x > x && rectangle.y + rectangle.getHeight() < y && radius * radius > Math.sqrt(x - rectangle.x) + Math.sqrt(y - (rectangle.y + rectangle.getHeight()))) {
-                dx = -dx;
-                dy = -dy;
-            }
-            else if (rectangle.x + rectangle.getWidth() < x && rectangle.y > y && radius * radius > Math.sqrt(x - (rectangle.x + rectangle.getWidth())) + Math.sqrt(y - rectangle.y)) {
-                dx = -dx;
-                dy = -dy;
-            }
-            else if (rectangle.x + rectangle.getWidth() < x && rectangle.y + rectangle.getHeight() < y && radius * radius > Math.sqrt(x - (rectangle.x + rectangle.getWidth())) + Math.sqrt(y - (rectangle.y + rectangle.getHeight()))) {
-                dx = -dx;
-                dy = -dy;
-            }
-            else if (rectangle.x < x && x < rectangle.x + rectangle.getWidth()) {
-                if (y + radius > rectangle.y &&  y - radius < rectangle.y + rectangle.getHeight()) {
+            else if (rectangle.getX() < x && x < rectangle.getMaxX()) {
+                if (y + radius > rectangle.getY() &&  y - radius < rectangle.getMaxY()) {
                     dy = -dy;
                 }
             }
-            else if (rectangle.y < y && y < rectangle.y + rectangle.getHeight()) {
-                if (x + radius > rectangle.x &&  x - radius < rectangle.x + rectangle.getWidth()) {
+            else if (rectangle.getY() < y && y < rectangle.getMaxY()) {
+                if (x + radius > rectangle.getX() &&  x - radius < rectangle.getMaxX()) {
                     dx = -dx;
                 }
             }
         }
+    }
+
+    private boolean isCollidingWithRectangleVertex(Rectangle rectangle) {
+        double[][] vertices = {
+                {rectangle.getX(), rectangle.getY()},                    // 왼쪽 상단
+                {rectangle.getX(), rectangle.getMaxY()},                  // 왼쪽 하단
+                {rectangle.getMaxX(), rectangle.getY()},                  // 오른쪽 상단
+                {rectangle.getMaxX(), rectangle.getMaxY()}                // 오른쪽 하단
+        };
+        for (double[] vertex : vertices) {
+            double vertexX = vertex[0];
+            double vertexY = vertex[1];
+            // 두 점 사이의 거리 계산
+            double distance = Math.pow(x - vertexX, 2) + Math.pow(y - vertexY, 2);
+
+            // 충돌 체크 (거리가 반지름보다 작으면 충돌)
+            if (radius * radius > distance) {
+                return true;
+            }
+        }
+        return false;
     }
 }
