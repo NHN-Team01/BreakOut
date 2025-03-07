@@ -3,17 +3,18 @@ package com.nhnacademy;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Brick extends Rectangle implements Breakable {
+public class Brick extends Rectangle implements Drawable, Breakable {
     private boolean isDestroyed; // 벽돌이 파괴되었는지 여부
+    private Color color;
 
     // 생성자
     public Brick(double x, double y, double width, double height, Color color) {
-        super(x, y, width, height, color);
+        super(x, y, width, height);
         this.isDestroyed = false; // 초기 상태는 파괴되지 않음
+        this.color = color;
     }
 
     // 벽돌을 그리는 메서드
-    @Override
     public void draw(GraphicsContext gc) {
         if (!isDestroyed) {
             gc.setFill(color);

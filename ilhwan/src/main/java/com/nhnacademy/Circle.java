@@ -7,10 +7,9 @@ import javafx.scene.paint.Color;
  * Circle 클래스는 Shape를 상속받으며, 원의 반지름 정보를 포함합니다.
  * 원의 경계는 중심 좌표와 반지름을 이용하여 계산됩니다.
  */
-public class Circle extends Shape implements Drawable {
+public abstract class Circle extends Shape {
     // 원의 반지름, 색상
     protected double radius;
-    protected Color color;
     
     /**
      * 생성자: 원의 중심 좌표와 반지름을 초기화합니다.
@@ -18,12 +17,10 @@ public class Circle extends Shape implements Drawable {
      * @param x 중심 X 좌표
      * @param y 중심 Y 좌표
      * @param radius 원의 반지름
-     * @param color 원의 색상
      */
-    public Circle(double x, double y, double radius, Color color) {
+    public Circle(double x, double y, double radius) {
             super(x, y);
             this.radius = radius;
-            this.color = color;
     }
 
     /**
@@ -73,15 +70,5 @@ public class Circle extends Shape implements Drawable {
     @Override
     public double getMaxY() {
         return getY() + radius;
-    }
-
-    /**
-     * 원을 그리는 메서드
-     * 
-     * @param gc 그리기 작업을 처리하는 GraphicsContext 객체
-     */
-    public void draw(GraphicsContext gc) {
-        gc.setFill(color);
-        gc.fillOval(getMinX(), getMinY(), radius * 2, radius * 2); // 중심을 기준으로 원 그리기
     }
 }

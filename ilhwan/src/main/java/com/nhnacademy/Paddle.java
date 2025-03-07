@@ -3,16 +3,18 @@ package com.nhnacademy;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Paddle extends Rectangle implements Movable, Collidable {
+public class Paddle extends Rectangle implements Drawable, Movable, Collidable {
     private double speed;   // 패들 속도
     private double dx = 0;      // X 방향 이동속도
     private final double dy = 0;  // Y 방향 이동속도 (패들은 Y 방향으로는 이동하지 않으므로 0)
+    private Color color;
     private boolean isPaused = false;
 
     // 생성자
     public Paddle(double x, double y, double width, double height, double speed, Color color) {
-        super(x, y, width, height, color);
+        super(x, y, width, height);
         this.speed = speed;
+        this.color = color;
     }
 
     // 패들을 그리는 메서드

@@ -37,6 +37,7 @@ public class Breakout extends Application {
         // Paddle 생성
         Paddle paddle = new Paddle(400, 550, 100, 20, 5, Color.BLUE);
         shapes.add(paddle);
+        shapes.add(new Ball(0, 0, 30, 0, 0,Color.WHITE));
 
         // 벽돌 생성
         int rows = 5;
