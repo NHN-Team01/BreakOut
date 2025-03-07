@@ -4,7 +4,6 @@ import javafx.scene.paint.Color;
 
 /**
  * 공통적인 속성을 가지는 추상클래스 Shape
- * 해당 클래스를 구현하는 클래스는 반드시 x, y 값의 최소값 최대값을 반환하는 메서드를 작성해야 한다
  *
  */
 public abstract class Shape {

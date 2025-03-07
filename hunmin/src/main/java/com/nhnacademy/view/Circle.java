@@ -5,20 +5,16 @@ import javafx.scene.paint.Color;
 
 
 public class Circle extends Shape implements Drawable {
-    public double radius;
+    protected double radius;
 
     public Circle(double x, double y, Color color, double radius) {
         super(x, y, color);
         this.radius = radius;
     }
 
-    public double getRadius() {
-        return radius;
-    }
-
     /**
-     * 중심을 기준으로 원그리기
-     * @param gc
+     * 중심을 기준으로 원을 그리는 메서드
+     * @param gc GraphicsContext 객체
      */
     @Override
     public void draw(GraphicsContext gc) {

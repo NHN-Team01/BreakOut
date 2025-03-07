@@ -4,8 +4,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Rectangle extends Shape implements Drawable{
-    public double width;
-    public double height;
+    protected double width;
+    protected double height;
 
     public Rectangle(double x, double y, Color color, double width, double height) {
         super(x, y, color);
@@ -13,6 +13,11 @@ public class Rectangle extends Shape implements Drawable{
         this.height = height;
     }
 
+
+    /**
+     * 좌측 상단을 기준으로 사각형을 그리는 메서드
+     * @param gc GraphicsContext 객체
+     */
     @Override
     public void draw(GraphicsContext gc) {
         gc.setFill(color);
