@@ -1,7 +1,5 @@
 package com.nhnacademy;
 
-import java.util.List;
-
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 

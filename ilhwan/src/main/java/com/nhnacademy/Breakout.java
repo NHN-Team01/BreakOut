@@ -3,6 +3,7 @@ package com.nhnacademy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -17,7 +18,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Breakout extends Application {
+public class Breakout extends Application implements GameEventListener {
     private boolean moveLeft = false;
     private boolean moveRight = false;
     private AnimationTimer gameLoop;
@@ -31,6 +32,7 @@ public class Breakout extends Application {
         // Canvas 생성
         Canvas canvas = new Canvas(canvasWidth, canvasHeight);
         GraphicsContext gc = canvas.getGraphicsContext2D();
+        EventManager.getInstance().addListener(this);
 
         // Ball 생성
         Ball ball = new Ball(400, 300, 10, 3, 3, Color.RED);
@@ -62,7 +64,7 @@ public class Breakout extends Application {
         Wall leftWall = new Wall(0, 0 + canvasHeight / 2, wallThickness, canvasHeight);
         Wall rightWall = new Wall(canvasWidth, 0 + canvasHeight / 2, wallThickness, canvasHeight);
         Wall topWall = new Wall(canvasWidth / 2, 0, canvasWidth, wallThickness);
-        Wall bottomWall = new Wall(canvasWidth / 2, canvasHeight, canvasWidth, wallThickness);
+        ObstacleWall bottomWall = new ObstacleWall(canvasWidth / 2, canvasHeight, canvasWidth, wallThickness);
         shapes.add(leftWall); shapes.add(rightWall); shapes.add(topWall); shapes.add(bottomWall);
 
         // 게임 루프
@@ -114,9 +116,8 @@ public class Breakout extends Application {
                 paddle.checkBounds(rightWall);
 
                 // 화면의 하단에 닿으면 게임 오버
-                if(ball.isAtBottom(bottomWall)) {
-                    gameStop = true;
-                    showGameOverPopup();
+                if(bottomWall.isCollisionDetected(ball)) {
+                    bottomWall.hit();
                 }
 
                 // Paddle 움직임 처리
@@ -159,6 +160,12 @@ public class Breakout extends Application {
         primaryStage.setTitle("Brick Breaker");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    @Override
+    public void onGameOver() {
+        gameStop = true;
+        showGameOverPopup();
     }
 
     // 팝업을 표시하고 종료하는 메서드
