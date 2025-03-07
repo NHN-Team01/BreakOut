@@ -7,6 +7,7 @@ public class Ball extends Circle implements Drawable, Movable{
     private double dx; // 공의 x축 속도 (단위: 픽셀/프레임)
     private double dy; // 공의 y축 속도 (단위: 픽셀/프레임)
     private Color color; // 공의 색상
+    private double maxSpeed;
 
     // 생성자
     public Ball(double x, double y, double radius, double dx, double dy, Color color) {
@@ -14,6 +15,7 @@ public class Ball extends Circle implements Drawable, Movable{
         this.dx = dx;
         this.dy = dy;
         this.color = color;
+        this.maxSpeed = 8;
     }
 
     @Override
@@ -28,15 +30,12 @@ public class Ball extends Circle implements Drawable, Movable{
         }
         if (closestY == other.getMaxY() || closestY == other.getMinY()) {
             dy = -dy;
-            if (other instanceof Paddle paddle) {
-                double paddleVelocity = paddle.getDx();
-                double maxSpeed = 8;
-                if (dx + paddleVelocity * 0.2 > maxSpeed) {
-                    dx = maxSpeed;
-                } else {
-                    dx += paddleVelocity * 0.2;
-                }
-            }
+
+        }
+        if (other instanceof Paddle paddle) {
+            double paddleSpeed = paddle.getDx();
+            setDx(paddleSpeed * 0.2 + dx);
+            System.out.println("dx: " + dx+"dy: "+dy);
         }
         repositionAfterCollision(other);
     }
@@ -69,7 +68,11 @@ public class Ball extends Circle implements Drawable, Movable{
 
     @Override
     public void setDx(double dx) {
-        this.dx = dx;
+        if (dx > maxSpeed) {
+            this.dx = maxSpeed;
+        } else {
+            this.dx = Math.max(dx, -maxSpeed);
+        }
     }
 
     @Override
