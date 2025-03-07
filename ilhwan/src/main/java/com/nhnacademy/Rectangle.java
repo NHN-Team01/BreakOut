@@ -1,8 +1,5 @@
 package com.nhnacademy;
 
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-
 /**
  * Rectangle 클래스는 Shape를 상속받으며, 사각형 도형의 폭(width)과 높이(height)를 포함합니다.
  * 도형의 경계는 중심 좌표와 폭, 높이를 이용하여 계산됩니다.

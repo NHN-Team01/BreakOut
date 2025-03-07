@@ -1,8 +1,5 @@
 package com.nhnacademy;
 
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-
 /**
  * Circle 클래스는 Shape를 상속받으며, 원의 반지름 정보를 포함합니다.
  * 원의 경계는 중심 좌표와 반지름을 이용하여 계산됩니다.
