@@ -23,11 +23,13 @@ public class Breakout extends Application {
     private AnimationTimer gameLoop;
     private boolean gameStop = false;
     private List<Shape> shapes = new ArrayList<>();
+    private double canvasWidth = 800;
+    private double canvasHeight = 600;
 
     @Override
     public void start(Stage primaryStage) {
         // Canvas 생성
-        Canvas canvas = new Canvas(800, 600);
+        Canvas canvas = new Canvas(canvasWidth, canvasHeight);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         // Ball 생성
@@ -37,7 +39,6 @@ public class Breakout extends Application {
         // Paddle 생성
         Paddle paddle = new Paddle(400, 550, 100, 20, 5, Color.BLUE);
         shapes.add(paddle);
-        shapes.add(new Ball(0, 0, 30, 0, 0,Color.WHITE));
 
         // 벽돌 생성
         int rows = 5;
@@ -45,16 +46,24 @@ public class Breakout extends Application {
         double brickWidth = 70;
         double brickHeight = 20;
         double padding = 5;
-        double startX = 50;
+        double startX = 27.5;
         double startY = 50;
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 double x = startX + col * (brickWidth + padding);
                 double y = startY + row * (brickHeight + padding);
-                shapes.add(new Brick(x, y, brickWidth, brickHeight, Color.BLUE));
+                shapes.add(new Brick(x + brickWidth / 2.0, y + brickHeight / 2.0, brickWidth, brickHeight, Color.BLUE));
             }
         }
+
+        // 게임의 창 경계에 배치할 Wall 생성
+        double wallThickness = 0;
+        Wall leftWall = new Wall(0, 0 + canvasHeight / 2, wallThickness, canvasHeight);
+        Wall rightWall = new Wall(canvasWidth, 0 + canvasHeight / 2, wallThickness, canvasHeight);
+        Wall topWall = new Wall(canvasWidth / 2, 0, canvasWidth, wallThickness);
+        Wall bottomWall = new Wall(canvasWidth / 2, canvasHeight, canvasWidth, wallThickness);
+        shapes.add(leftWall); shapes.add(rightWall); shapes.add(topWall); shapes.add(bottomWall);
 
         // 게임 루프
         gameLoop = new AnimationTimer() {
@@ -100,10 +109,12 @@ public class Breakout extends Application {
                 // 순회가 끝난 후, 삭제할 객체들을 리스트에서 제거
                 shapes.removeAll(objectsToRemove);
 
-                ball.checkCollision(canvas.getWidth(), canvas.getHeight());
+                // Paddle 경계 확인 및 그리기
+                paddle.checkBounds(leftWall);
+                paddle.checkBounds(rightWall);
 
                 // 화면의 하단에 닿으면 게임 오버
-                if(ball.isAtBottom(canvas.getHeight())) {
+                if(ball.isAtBottom(bottomWall)) {
                     gameStop = true;
                     showGameOverPopup();
                 }
@@ -118,9 +129,6 @@ public class Breakout extends Application {
                 if (moveLeft == moveRight) { // 방향키가 동시에 눌러져 있거나 둘다 눌러져있지 않을 때 패들 속도 0으로 설정
                     paddle.setDx(0);
                 }
-
-                // Paddle 경계 확인 및 그리기
-                paddle.checkBounds(canvas.getWidth());
             }
         };
         gameLoop.start();
@@ -130,7 +138,7 @@ public class Breakout extends Application {
         root.getChildren().add(canvas);
 
         // 키보드 입력 처리
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, canvasWidth, canvasHeight);
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.LEFT) {

@@ -1,5 +1,7 @@
 package com.nhnacademy;
 
+import java.util.List;
+
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -66,11 +68,22 @@ public class Paddle extends Rectangle implements Drawable, Movable, Collidable {
     }
 
     // 패들이 화면 경계를 벗어나지 않도록 제한
-    public void checkBounds(double canvasWidth) {
-        if (x - width / 2 < 0) { // 왼쪽 경계
-            x = width / 2;
-        } else if (x + width / 2 > canvasWidth) { // 오른쪽 경계
-            x = canvasWidth - width / 2;
+    public void checkBounds(Wall wall) {
+        // 오른쪽으로 이동 중인데, 전달된 벽이 패들보다 왼쪽에 있다면 무시
+        if(dx > 0 && wall.getX() < getMinX() ) {
+            return;
+        }
+        // 왼쪽으로 이동 중인데, 전달된 벽이 패들보다 오른쪽에 있다면 무시
+        if(dx < 0 && wall.getX() > getMaxX()) {
+            return;
+        }
+
+        // 충돌 검사
+        if(dx < 0 && getMinX() < wall.getX()) {
+            x = wall.getX() + width / 2;
+        }
+        if(dx > 0 && getMaxX() > wall.getX()) {
+            x = wall.getX() - width / 2;
         }
     }
 
